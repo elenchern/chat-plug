@@ -3,31 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link href="style.css" rel="stylesheet"/>
     <title>Chat-plug</title>
-    <link href="style1.css" rel="stylesheet" /> 
-    <link href="https://vjs.zencdn.net/7.15.4/video-js.css" rel="stylesheet" />  
-    <script src="https://vjs.zencdn.net/7.15.4/video.min.js"></script> 
+    <link href="https://vjs.zencdn.net/7.15.4/video-js.css" rel="stylesheet"/>
+    <script src="https://vjs.zencdn.net/7.15.4/video.min.js"></script>
 </head>
 
 <body>
-    <div class="chat-plagin">
-        <div class="video">
-            <video class="video-js vjs-big-play-centered vid" controls   id="video-exam"  data-setup='{"fluid": true}' vjs-16-9 > 
-                <source src="Halloween.mp4" type="video/mp4">  
+    <div class="video-js chat-plug" id="video-js">
+        <div class="vjs_video">
+            <video controls class="video-js vjs-big-play-centered" controls id="video-exam" vjs-16-9> 
+                <source src="Halloween.mp4" type="video/mp4">
             </video>
-            
-        </div>
-       <div class="chat" id="chat" >
-            <div class="message"> <p id="message"></p> </div>
-            <input id="inputMessage"  type="text" placeholder="Message...">
-            <button id="btnSend" type="button" class="btn">Send</button>
         </div>
     </div>
-        
-    
-    <script src="script.js"></script> 
 
+    <script src="script.js"></script>
 </body>
-
 </html>
