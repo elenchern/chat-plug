@@ -30,7 +30,7 @@ function examplePlugin(){
 
   this.addChild('ChatComponent');
   chat.style.visibility='hidden';
-  if ((JSON.parse(localStorage.getItem('key'))).length ==null){
+  if ((JSON.parse(localStorage.getItem('key'))) ==null){
     id=0}
   else{
     id=(JSON.parse(localStorage.getItem('key'))).length;
@@ -39,14 +39,14 @@ function examplePlugin(){
       messageArray = JSON.parse(localStorage.getItem('key'));
     };
   };
-
+  
    this.on('playing', function(){
      chat.style.visibility='visible';
    });
 
   btnSend.onclick  = function(){
     messageArray.push({'id':id, 'message':inputMessage.value });
-    localStorage.setItem('key',  JSON.stringify(messageArray));
+    localStorage.setItem('key', JSON.stringify(messageArray));
     chat_message.innerHTML +=messageArray[id].message +'<br/>';
     inputMessage.value='';
     id+=1;
@@ -54,10 +54,10 @@ function examplePlugin(){
 
   inputMessage.onkeyup = function(ent){
     if(ent.keyCode==13){
-     messageArray.push({'id':id, 'message':inputMessage.value });
-      localStorage.setItem('key',  JSON.stringify(messageArray));
-     chat_message.innerHTML +=messageArray[id].message +'<br/>';
-     inputMessage.value='';
+      messageArray.push({'id':id, 'message':inputMessage.value });
+      localStorage.setItem('key', JSON.stringify(messageArray));
+      chat_message.innerHTML +=messageArray[id].message +'<br/>';
+      inputMessage.value='';
       id+=1;
     };
   };
@@ -65,3 +65,4 @@ function examplePlugin(){
 
  videojs.registerPlugin('examplePlugin', examplePlugin);
  player.examplePlugin();
+
