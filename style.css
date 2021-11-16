@@ -1,5 +1,5 @@
 html, body{margin:0;padding:0;}
-.chat-plug{
+.chat-plugin{
     margin: 0 auto;
     width: 50%;
     max-width: 1300px;
@@ -8,13 +8,13 @@ html, body{margin:0;padding:0;}
     background: white !important;
 }
 
- .chat{
+ .vjs-chat{
     position: relative; 
     height: 300px;
     background: linear-gradient(to top, rgb(241, 70, 2),rgb(0, 0, 0));
 }
 
-.chat_btn{
+.vjs-chat_DivButton{
     color: rgb(241, 70, 2);
     text-align: center;
     background: black;
@@ -25,7 +25,7 @@ html, body{margin:0;padding:0;}
     min-width: 49px;
 }
 
-input{
+.vjs-chat_input{
     width: 70%;
     left: 5%;
     margin-left: 0;
@@ -33,13 +33,13 @@ input{
     overflow: auto;
 }
 
-.chat_btn,input{
+.vjs-chat_DivButton,.vjs-chat_input{
     position: absolute;
     height: 24px;
     bottom: 20px;
 }
 
-.chat_message{
+.vjs-chat_DivMessages{
     position: absolute;
     margin-top: 20px;
     margin-left: 5%;
@@ -50,11 +50,11 @@ input{
     overflow: auto;
 }
 
-p{
+.vjs-chat_pMessage{
    margin-left: 15px;
 }
 
-.btnSend-btn{
+.vjs-chat_button{
     margin: 0 auto;
     margin-top: 5px;
 }
