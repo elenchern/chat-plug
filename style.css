@@ -14,7 +14,7 @@ html, body{margin:0;padding:0;}
     background: linear-gradient(to top, rgb(241, 70, 2),rgb(0, 0, 0));
 }
 
-.vjs-chat_DivButton{
+.vjs-chat_button-container{
     color: rgb(241, 70, 2);
     text-align: center;
     background: black;
@@ -33,13 +33,13 @@ html, body{margin:0;padding:0;}
     overflow: auto;
 }
 
-.vjs-chat_DivButton,.vjs-chat_input{
+.vjs-chat_button-container,.vjs-chat_input{
     position: absolute;
     height: 24px;
     bottom: 20px;
 }
 
-.vjs-chat_DivMessages{
+.vjs-chat_messages-container{
     position: absolute;
     margin-top: 20px;
     margin-left: 5%;
