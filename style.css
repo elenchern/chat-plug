@@ -14,7 +14,7 @@ html, body{margin:0;padding:0;}
     background: linear-gradient(to top, rgb(241, 70, 2),rgb(0, 0, 0));
 }
 
-.vjs-chat_button-container{
+.vjs-chat__button-container{
     color: rgb(241, 70, 2);
     text-align: center;
     background: black;
@@ -25,7 +25,7 @@ html, body{margin:0;padding:0;}
     min-width: 49px;
 }
 
-.vjs-chat_input{
+.vjs-chat__input{
     width: 70%;
     left: 5%;
     margin-left: 0;
@@ -33,13 +33,13 @@ html, body{margin:0;padding:0;}
     overflow: auto;
 }
 
-.vjs-chat_button-container,.vjs-chat_input{
+.vjs-chat__button-container,.vjs-chat__input{
     position: absolute;
     height: 24px;
     bottom: 20px;
 }
 
-.vjs-chat_messages-container{
+.vjs-chat__messages-container{
     position: absolute;
     margin-top: 20px;
     margin-left: 5%;
@@ -50,11 +50,11 @@ html, body{margin:0;padding:0;}
     overflow: auto;
 }
 
-.vjs-chat_pMessage{
+.vjs-chat__message-p{
    margin-left: 15px;
 }
 
-.vjs-chat_button{
+.vjs-chat__button{
     margin: 0 auto;
     margin-top: 5px;
 }

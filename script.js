@@ -14,9 +14,9 @@ class ChatComponent extends Component {
   };
   getTemplate() {
     return `
-      <div class="vjs-chat_messages-container"><p class="vjs-chat_pMessage"></p></div>
-      <input class="vjs-chat_input" type="text" placeholder="Message...">
-      <div class ="vjs-chat_button-container"><button class="vjs-chat_button">Send</div>`
+      <div class="vjs-chat__messages-container"><p class="vjs-chat__message-p"></p></div>
+      <input class="vjs-chat__input" type="text" placeholder="Message...">
+      <div class ="vjs-chat__button-container"><button class="vjs-chat__button">Send</div>`
   };
 };
 
@@ -26,9 +26,9 @@ function examplePlugin() {
   this.addChild('ChatComponent');
   let messageArray = [];
   let vjs_chat = document.querySelector('.vjs-chat');
-  let chat_message = document.querySelector('.vjs-chat_pMessage');
-  let inputMessage = document.querySelector('.vjs-chat_input');
-  let btnSend = document.querySelector('.vjs-chat_button-container');
+  let chat_message = document.querySelector('.vjs-chat__message-p');
+  let inputMessage = document.querySelector('.vjs-chat__input');
+  let btnSend = document.querySelector('.vjs-chat__button-container');
   let saveMessage = JSON.parse( localStorage.getItem('messageList') );
 
   vjs_chat.style.visibility = 'hidden';
@@ -73,4 +73,4 @@ videojs('video-exam', {
       examplePlugin: true
   }
 });
-
+console.log(videojs('video-exam').textNode_)
