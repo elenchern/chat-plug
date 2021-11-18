@@ -73,4 +73,4 @@ videojs('video-exam', {
       examplePlugin: true
   }
 });
-console.log(videojs('video-exam').textNode_)
+
