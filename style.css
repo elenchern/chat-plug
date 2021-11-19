@@ -1,4 +1,7 @@
-html, body {margin:0;padding:0;}
+html, body {
+    margin:0;padding:0;
+}
+
 .chat-plugin {
     margin: 0 auto;
     width: 50%;
@@ -8,21 +11,26 @@ html, body {margin:0;padding:0;}
     background: white !important;
 }
 
- .vjs-chat {
-    position: relative; 
+.vjs-chat {
+    position: relative;
     height: 300px;
     background: linear-gradient(to top, rgb(241, 70, 2),rgb(0, 0, 0));
 }
 
 .vjs-chat__button-container {
-    color: rgb(241, 70, 2);
-    text-align: center;
-    background: black;
     right: 5%;
     width: 20%;
-    border-radius: 0px 10px 10px 0;
+    text-align: center;
     font-size: 120%;
     min-width: 49px;
+    background: black;
+    color: rgb(241, 70, 2);
+    border-radius: 0px 10px 10px 0;
+}
+
+.vjs-chat__button {
+    margin: 0 auto;
+    margin-top: 5px;
 }
 
 .vjs-chat__input {
@@ -33,7 +41,7 @@ html, body {margin:0;padding:0;}
     overflow: auto;
 }
 
-.vjs-chat__button-container,.vjs-chat__input {
+.vjs-chat__button-container, .vjs-chat__input {
     position: absolute;
     height: 24px;
     bottom: 20px;
@@ -51,10 +59,5 @@ html, body {margin:0;padding:0;}
 }
 
 .vjs-chat__message-p {
-   margin-left: 15px;
-}
-
-.vjs-chat__button {
-    margin: 0 auto;
-    margin-top: 5px;
+    margin-left: 15px;
 }
