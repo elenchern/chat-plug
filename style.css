@@ -18,7 +18,12 @@ html, body {
     background: linear-gradient( to top, rgb(241, 70, 2),rgb(0, 0, 0) );
 }
 
+.vjs-chat_hidden {
+    visibility: hidden;
+}
+
 .vjs-chat__button-container {
+    /* top: 5px; */
     right: 17%;
     width: 20%;
     text-align: center;
@@ -33,6 +38,7 @@ html, body {
     right: 20%;
     width: 15%;
     text-align: center;
+    padding-top: 5px;
     font-size: 120%;
     min-width: 49px;
     background: black;
@@ -40,9 +46,9 @@ html, body {
     cursor: pointer;
 }
 
-.vjs-chat__button {
+.vjs-chat__button-container {
     margin: 0 auto;
-    margin-top: 5px;
+    padding-top: 5px;
     cursor: pointer;
 }
 
@@ -88,7 +94,7 @@ html, body {
     color: black;
 }
 
-.vjs-chat__input-downloadPic {
+.vjs-chat__input-download-pic {
     width: 80px;
     height: 80px;
     opacity: 0;
@@ -106,7 +112,7 @@ html, body {
 }
 
 
-.vjs-chat__button-container--hidden, .vjs-chat__textarea--hidden {
+.vjs-chat__button-container_hidden, .vjs-chat__textarea_hidden {
     display: none;
 }
 
@@ -178,7 +184,8 @@ html, body {
     top: 25px;
 }
 
-.vjs-chat__imgAva {
+.vjs-chat__img-ava {
+    background-image: url('img/defoult_ava.png');
     background-size: 30px;
     position: absolute;
     width: 10%;
