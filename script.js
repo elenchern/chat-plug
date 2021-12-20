@@ -16,6 +16,9 @@ class ChatComponent extends Component {
       <div class="vjs-chat__messages-container"></div>
       <input class="vjs-chat__input-username" type="text" placeholder="User">
       <div class="vjs-chat__button-login">login</div>
+      <label class="vjs-chat__label-container">
+        <input class="vjs-chat__input-admin" id="admin" type="checkbox">Admin
+      </label>
       <div class="vjs-chat__button-load">
         <input type="file" class="vjs-chat__input-download-pic" accept="image/*">
         <div class="vjs-chat__button-choose-ava">Choose</div>
@@ -45,31 +48,46 @@ function ExamplePlugin() {
   let btnLoad = videoJs.querySelector('.vjs-chat__button-load');
   let isPinned = document.querySelector('.vjs-chat__pinned-message');
   let inputDownload = videoJs.querySelector('.vjs-chat__input-download-pic');
+  let isAdmin = videoJs.querySelector('.vjs-chat__input-admin');
   let saveMessage = JSON.parse( localStorage.getItem('messageList') );
   let saveAvatar = JSON.parse( localStorage.getItem('messageAva') );
   let saveUser = JSON.parse( localStorage.getItem('Username') );
   let savePinnedMessage = JSON.parse( localStorage.getItem('Pinned') );
 
+  let admin = 0;
   let reader = '';
+  let themeMessage = '';
+
   vjsChat.classList.add('vjs-chat_hidden');
   isPinned.classList.add('vjs-chat_hidden');
 
   if (savePinnedMessage != null) {
     isPinned.classList.remove('vjs-chat_hidden');
     isPinned.innerHTML = savePinnedMessage;
-  }
+  };
+
+  isAdmin.onchange = function() {
+    if (isAdmin.checked) {
+      admin = 1;
+    } else {
+      admin = 0;
+    };
+  };
 
   if (saveMessage == null) {
     id = 0;
+    videoJs.querySelector('.vjs-chat__button-like').classList.add('vjs-chat_hidden');
     textareaMessage.classList.add('vjs-chat__textarea_hidden');
     btnSend.classList.add('vjs-chat__button-container_hidden');
   } else {
+    videoJs.querySelector('.vjs-chat__label-container').classList.add('vjs-chat_hidden');
     id = saveMessage.length;
     for (var i = 0; i < saveMessage.length; i++) {
       chatContainer.innerHTML += saveMessage[i].message;
       messageArray = saveMessage;
       chatContainer.scrollTop = chatContainer.scrollHeight;
       if (saveUser == null) {//если ника нет, то отправка сообщений недоступна
+        console.log('gh')
         textareaMessage.classList.add('vjs-chat__textarea_hidden');
         btnSend.classList.add('vjs-chat__button-container_hidden');
       };
@@ -84,14 +102,16 @@ function ExamplePlugin() {
 
     let myButton = this.controlBar.addChild("button"); //добавление кнопки открытия/закрытия чата
     myButtonDom = myButton.el();
-    myButtonDom.innerHTML = '<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><use xlink:href="icon.svg#icon_1"/></svg>';
-    myButtonDom.onclick = function() {
-      if (vjsChat.style.visibility == 'visible') {
-        myButtonDom.querySelector('path').setAttribute("fill", "white");//изменение цвета иконкиы
-        vjsChat.classList.add('vjs-chat_hidden');
-      } else {
+    myButtonDom.innerHTML = '<svg class="vjs-svg-use-button" fill="white" width="70%" height="70%" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><use class="vjs-chat__svg-use-button" xlink:href="icon.svg#icon_1"/></svg>';
+    svgBttn = myButtonDom.querySelector('.vjs-chat__svg-use-button');
+    svgIcon = myButtonDom.querySelector('.vjs-chat__svg-button');
+    svgBttn.onclick = function() {
+      if (vjsChat.classList.contains('vjs-chat_hidden')) {
+        myButtonDom.querySelector('svg').setAttribute("fill", "white");//изменение цвета иконкиы
         vjsChat.classList.remove('vjs-chat_hidden');
-        myButtonDom.querySelector('path').setAttribute("fill", "rgb(241, 70, 2)");
+      } else {
+        vjsChat.classList.add('vjs-chat_hidden');
+        myButtonDom.querySelector('svg').setAttribute("fill", "rgb(241, 70, 2)");
       };
     };
     let fullscreen = videoJs.querySelector('.vjs-fullscreen-control');
@@ -130,10 +150,12 @@ function ExamplePlugin() {
   };
 
   btnLogin.onclick = function() { //сохранение имя пользователя, показ чата
-    user = ( {'userName': inputUsername.value} );
+    user = ( {'userName': inputUsername.value, 'isAdmin': admin} );
     localStorage.setItem( 'Username', JSON.stringify(user) );
     textareaMessage.classList.remove('vjs-chat__textarea_hidden');
     btnSend.classList.remove('vjs-chat__button-container_hidden');
+    videoJs.querySelector('.vjs-chat__label-container').classList.add('vjs-chat_hidden');
+    videoJs.querySelector('.vjs-chat__button-like').classList.remove('vjs-chat_hidden');
   };
 
   let messAva = videoJs.getElementsByClassName('vjs-chat__img-ava');//аватарка в сообщениях
@@ -146,10 +168,23 @@ function ExamplePlugin() {
   };
 
   btnSend.onclick = function() {
+    if (saveUser == null) {
+      if (admin == 1) {
+        themeMessage = 'vjs-chat_theme_admin';
+      } else if (admin == 0) {
+        themeMessage = 'vjs-chat_theme';
+      };
+    } else {
+      if (saveUser.isAdmin == 1) {
+        themeMessage = 'vjs-chat_theme_admin';
+      } else if (saveUser.isAdmin == 0) {
+        themeMessage = 'vjs-chat_theme';
+      };
+    };
     messageArray.push( {'id':id,
     'message': `<div class="vjs-chat__container-fullmessage">
     <div class="vjs-chat__img-ava"></div>
-    <div class="vjs-chat__message theme"> ${ JSON.parse( localStorage.getItem('Username') ).userName}</br>
+    <div class="vjs-chat__message ${themeMessage}"> ${ JSON.parse( localStorage.getItem('Username') ).userName}</br>
     ${textareaMessage.value}</div>`} );
 
     localStorage.setItem( 'messageList', JSON.stringify(messageArray) );
@@ -168,10 +203,23 @@ function ExamplePlugin() {
 
   textareaMessage.onkeyup = function(ent) { //отправка по enter
     if(ent.keyCode==13){
+      if (saveUser == null) {
+        if (admin == 1) {
+          themeMessage = 'vjs-chat_theme_admin';
+        } else if (admin == 0) {
+          themeMessage = 'vjs-chat_theme';
+        };
+      } else {
+        if (saveUser.isAdmin == 1) {
+          themeMessage = 'vjs-chat_theme_admin';
+        } else if (saveUser.isAdmin == 0) {
+          themeMessage = 'vjs-chat_theme';
+        };
+      };
       messageArray.push( {'id':id,
       'message': `<div class="vjs-chat__container-fullmessage">
       <div class="vjs-chat__img-ava"></div>
-      <div class="vjs-chat__message theme"> ${ JSON.parse( localStorage.getItem('Username') ).userName}</br>
+      <div class="vjs-chat__message ${themeMessage}"> ${JSON.parse( localStorage.getItem('Username') ).userName}</br>
       ${textareaMessage.value}</div>`} );
 
       localStorage.setItem( 'messageList', JSON.stringify(messageArray) );
@@ -193,7 +241,7 @@ function ExamplePlugin() {
       isPinned.classList.remove('vjs-chat_hidden');
       isPinned.innerHTML = this.innerHTML;
       theme = isPinned.querySelector('.vjs-chat__message');
-      theme.className = "theme_blur";
+      theme.className = "vjs-chat_theme_blur";
       localStorage.setItem( 'Pinned', JSON.stringify(isPinned.innerHTML) );
     };
   };
