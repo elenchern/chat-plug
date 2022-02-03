@@ -31,8 +31,9 @@ class ChatComponent extends Component {
           </div>
           <div class="vjs-chat__textarea" contenteditable>Добавить комментарий</div>
         </div>
-        <img class="vjs-chat__img-button-like" src="img/like2.png" alt="like">
-      </div>`;
+        <img class="vjs-chat__img-button-like" src="img/like.png" alt="like">
+      </div>
+      <div class="vjs-chat__container-answer-message vjs-chat_hidden">Сообщение прикреплено</div>`;
   };
 };
 
@@ -42,9 +43,47 @@ function ExamplePlugin() {
   this.addChild('ChatComponent');
 
   videoJs = this.el();
-  let messageArray = [];
+
   let saveImg = [];
   let user = [];
+  let messageArray = [];
+  let messageArray_fid = [
+    {
+			"id": "0",
+			"userName": "Admin",
+			"isPinned": true,
+			"isAdmin": true,
+			"message":" Дополнительная скидка 15% по промокоду ВЕСНА15",
+			"avatar": "https://cdn-icons-png.flaticon.com/512/194/194938.png",
+			"answerTo": null
+		}, {
+			"id": "1",
+			"userName": "Костя Морозов",
+			"isPinned": false,
+			"isAdmin": false,
+			"message": "Надюша начинай",
+			"avatar": "https://www.pngarts.com/files/5/User-Avatar-PNG-Free-Download.png",
+			"answerTo": null
+		 }, {
+			"id": "2",
+			"userName": "Рузанна Комиссарова",
+			"isPinned": false,
+			"isAdmin": false,
+			"message": "Здравствуйте, как купить туфли",
+			"avatar": null,
+			"answerTo": null
+		}, {
+			"id": "3",
+			"userName": "Admin",
+			"isPinned": false,
+			"isAdmin": true,
+			"message": "Надюша начинай",
+			"avatar": null,
+			"answerTo": "2"
+		}
+  ];
+
+  let messAva = videoJs.getElementsByClassName('vjs-chat__img-ava');
   let vjsChat = videoJs.querySelector('.vjs-chat');
   let textareaMessage = videoJs.querySelector('.vjs-chat__textarea');
   let chatContainer = videoJs.querySelector('.vjs-chat__messages-container');
@@ -58,20 +97,66 @@ function ExamplePlugin() {
   let saveAvatar = JSON.parse( localStorage.getItem('messageAva') );
   let saveUser = JSON.parse( localStorage.getItem('Username') );
   let savePinnedMessage = JSON.parse( localStorage.getItem('Pinned') );
+  let saveMessage_fid = JSON.parse( localStorage.getItem('messageList_fid') );
 
   let admin = false;
   let readerImg = '';
   let themeMessage = '';
 
+  localStorage.setItem( 'messageList_fid', JSON.stringify(messageArray_fid) );
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+
+  if (saveMessage_fid != null) {
+    for (var i = 0; i < saveMessage_fid.length; i++) {
+      if (saveMessage_fid[i].answerTo == null) {
+      chatContainer.innerHTML += `<div class="vjs-chat__container-fullmessage">
+      <div class="vjs-chat__img-ava"></div>
+      <div class="vjs-chat__message">${saveMessage_fid[i].userName}</br>${saveMessage_fid[i].message}</div>
+      <img src="img/otvet2.png" class="vjs-chat__img-answer" alt="answer" id="${ i }" title="Ответить">`;
+      } else if (saveMessage_fid[i].answerTo != null) {
+        for (var j = 0; j < saveMessage_fid.length; j++) {
+          if (saveMessage_fid[i].answerTo == j) {
+            chatContainer.innerHTML += `
+            <div class="vjs-chat__container-fullmessage">
+              <div class="vjs-chat__img-ava"></div>
+              <div class="vjs-chat__message"><div class="vjs-chat__message_answer">
+              ${saveMessage_fid[j].userName}</br>${saveMessage_fid[j].message}</div>
+              ${saveMessage_fid[i].userName}</br>${saveMessage_fid[i].message}</div>
+            <img src="img/otvet2.png" class="vjs-chat__img-answer" id="${ i }" alt="answer" title="Ответить">`;
+          };
+        };
+      };
+
+      if (saveMessage_fid[i].avatar != null) {
+        messAva[i].style.backgroundImage = 'url(' + saveMessage_fid[i].avatar + ')';
+      } else if (saveMessage_fid[i].avatar == null) {
+        messAva[i].style.backgroundImage = 'url("img/default_ava.png")';
+      };
+
+      let chatMessage =  videoJs.querySelectorAll('.vjs-chat__message');
+      if (saveMessage_fid[i].isAdmin == true) {
+        chatMessage[i].classList.add('vjs-chat_theme_admin');
+      } else {
+        chatMessage[i].classList.add('vjs-chat_theme');
+      };
+
+      if (saveMessage_fid[i].isPinned == true) {
+        isPinned.classList.remove('vjs-chat_hidden');
+        isPinned.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
+        <div class="vjs-chat_pinned-line">${chatMessage[i].innerHTML}<div>`;
+      };
+    };
+  };
+
   if (vjsChat.parentElement.clientWidth >= 1280) { //размер чата в зависимостти от ширины плеера
     vjsChat.classList.add('vjs-chat_width-deskstop');
-  } else if (vjsChat.parentElement.clientWidth >= 768) {
+  } else if ((vjsChat.parentElement.clientWidth >= 768) & (vjsChat.parentElement.clientWidth <= 1280)) {
     vjsChat.classList.add('vjs-chat_width-tablet');
   } else if (vjsChat.parentElement.clientWidth < 768) {
     vjsChat.classList.add('vjs-chat_width-mobile');
   };
 
-  // vjsChat.classList.add('vjs-chat_hidden');
+  vjsChat.classList.add('vjs-chat_hidden');
 
   if (savePinnedMessage != null) {
     isPinned.classList.remove('vjs-chat_hidden');
@@ -85,15 +170,16 @@ function ExamplePlugin() {
   };
 
   if (saveMessage == null) {
-    id = 0;
+    OnclickAnswer();
+    id = saveMessage_fid.length;
   } else {
     videoJs.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat_hidden');
     videoJs.querySelector('.vjs-chat__registr-container').classList.add('vjs-chat_hidden');
 
-    id = saveMessage.length;
+    id = saveMessage.length + saveMessage_fid.length;
     for (var i = 0; i < saveMessage.length; i++) {
       chatContainer.innerHTML += saveMessage[i].message;
-      messageArray = saveMessage;
+      messageArray= saveMessage;
       chatContainer.scrollTop = chatContainer.scrollHeight;
     };
   };
@@ -119,7 +205,15 @@ function ExamplePlugin() {
       };
     };
     this.on = null;
-  });
+
+    // console.log(saveMessage_fid.length + saveMessage.length)
+    // for (var i=0; i < saveMessage_fid.length + saveMessage.length; i++) {
+    //   console.log(document.getElementById(i))}
+    OnclickAnswer();
+   });
+
+  saveImg = ( {'avatar': btnLoad.style.backgroundImage} );
+  localStorage.setItem( 'messageAva', JSON.stringify(saveImg) );
 
   inputDownload.onchange = function() { //загрузка и сохранение аватарки
     let file = videoJs.querySelector('input[type=file]').files[0];
@@ -147,61 +241,124 @@ function ExamplePlugin() {
     videoJs.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat_hidden');
   };
 
-  let messAva = videoJs.getElementsByClassName('vjs-chat__img-ava');//аватарка в сообщениях
-  for (var i=0; i < messAva.length; i++) {
-    if (saveAvatar != null) {
-      messAva[i].style.backgroundImage = saveAvatar.avatar;
-    } else {
-      messAva[i].style.backgroundImage = 'url(img/default_ava.png)';
+  let messAvan = videoJs.getElementsByClassName('vjs-chat__img-ava');//аватарка в сообщениях
+  if (saveMessage != null){
+    for (var n = saveMessage_fid.length; n < (saveMessage_fid.length + messageArray.length); n++) {
+      if (saveAvatar != null) {
+        messAvan[n].style.backgroundImage = saveAvatar.avatar;
+      } else {
+        messAvan[n].style.backgroundImage = 'url(img/default_ava.png)';
+      };
     };
   };
 
-  textareaMessage.onkeyup = function(ent) { //отправка по enter
-    if(ent.keyCode==13) {
-      if (saveUser == null) {
-        if (admin == true) {
-          themeMessage = 'vjs-chat_theme_admin';
-        } else if (admin == false) {
-          themeMessage = 'vjs-chat_theme';
-        };
-      } else {
-        if (saveUser.isAdmin == true) {
-          themeMessage = 'vjs-chat_theme_admin';
-        } else if (saveUser.isAdmin == false) {
-          themeMessage = 'vjs-chat_theme';
-        };
+  let messageContent = '';
+  function MessegeContent(){
+    saveUser = JSON.parse( localStorage.getItem('Username') );
+    if (saveUser == null) {
+      if (admin == true) {
+        themeMessage = 'vjs-chat_theme_admin';
+      } else if (admin == false) {
+        themeMessage = 'vjs-chat_theme';
       };
-      messageArray.push( {'id':id,
-      'message': `<div class="vjs-chat__container-fullmessage">
-      <div class="vjs-chat__img-ava"></div>
-      <div class="vjs-chat__message ${themeMessage}"> ${JSON.parse( localStorage.getItem('Username') ).userName}</br>
-      ${textareaMessage.textContent}</div>`} );
+    } else {
+      if (saveUser.isAdmin == true) {
+        themeMessage = 'vjs-chat_theme_admin';
+      } else if (saveUser.isAdmin == false) {
+        themeMessage = 'vjs-chat_theme';
+      };
+    };
 
+    if (toAnswer == '') {
+      messageContent = `
+      <div class="vjs-chat__container-fullmessage">
+        <div class="vjs-chat__img-ava"></div>
+        <div class="vjs-chat__message ${themeMessage}"> ${saveUser.userName}</br>
+        ${textareaMessage.textContent}</div>
+      <img src="img/otvet2.png" class="vjs-chat__img-answer" id="${videoJs.querySelectorAll('.vjs-chat__message').length }" alt="answer" title="Ответить">`;
+    } else {
+      messageContent = `
+      <div class="vjs-chat__container-fullmessage">
+        <div class="vjs-chat__img-ava"></div>
+        <div class="vjs-chat__message ${themeMessage}"><div class="vjs-chat__message_answer">
+        ${toAnswer}</div>
+        ${saveUser.userName}</br>${textareaMessage.textContent}</div>
+      <img src="img/otvet2.png" class="vjs-chat__img-answer" id="${videoJs.querySelectorAll('.vjs-chat__message').length }" alt="answer" title="Ответить">`;
+    };
+    return messageContent;
+  };
+
+  textareaMessage.onkeyup = function(ent) { //отправка по enter
+    let ava = '';
+    if(ent.keyCode==13) {
+      let answerMessage = videoJs.querySelector('.vjs-chat__container-answer-message');
+      answerMessage.classList.add('vjs-chat_hidden');
+      if(btnLoad.style.backgroundImage != '') {
+        ava = btnLoad.style.backgroundImage;
+      } else {
+        ava = null;
+      };
+      MessegeContent();
+
+      messageArray.push( {'id':id, 
+      'message': messageContent, 'avatar': ava });
       localStorage.setItem( 'messageList', JSON.stringify(messageArray) );
-      chatContainer.innerHTML += messageArray[id].message;
+
+      let ind = messageArray.length-1;
+      chatContainer.innerHTML += messageArray[ind].message;
       chatContainer.scrollTop = chatContainer.scrollHeight;
       textareaMessage.textContent = '';
-      id += 1;
-      for (var i=0; i < messAva.length; i++) {
+      for (var i=messageArray_fid.length; i < messAva.length; i++) {
         if (saveAvatar != null) {
           messAva[i].style.backgroundImage = saveAvatar.avatar;
         };
       };
     };
+
+    OnclickAnswer();
+    OnclickPinned();
+    let answerMessage = videoJs.querySelector('.vjs-chat__container-answer-message');
+    if ( answerMessage.classList.length == 2){toAnswer = '';};
   };
 
   let divMessage = videoJs.getElementsByClassName('vjs-chat__message');
-  for (var i=0; i < divMessage.length; i++) { //закреплёные сооббщения
-    divMessage[i].onclick = function() {
-      isPinned.classList.remove('vjs-chat_hidden');
-      isPinned.innerHTML = this.innerHTML;
-      localStorage.setItem( 'Pinned', JSON.stringify(isPinned.innerHTML) );
+  function OnclickPinned() {
+    for (var i=0; i < divMessage.length; i++) { //закреплёные сооббщения
+      divMessage[i].onclick = function() {
+        isPinned.classList.remove('vjs-chat_hidden');
+        isPinned.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
+        <div class="vjs-chat_pinned-line">${this.innerHTML}`;
+        localStorage.setItem( 'Pinned', JSON.stringify(isPinned.innerHTML) );
+      };
     };
   };
+  OnclickPinned();
+
   isPinned.onclick = function() {
     window.localStorage.removeItem("Pinned");
     this.classList.add('vjs-chat_hidden');
   };
+
+  let toAnswer= '';
+  function OnclickAnswer() {
+    let saveMessageLength = 0;
+    if (saveMessage == null) {
+      saveMessageLength = 0;
+    } else {saveMessageLength = saveMessage.length};
+
+    let answerMessage = videoJs.querySelector('.vjs-chat__container-answer-message');
+    for (var i=0; i < saveMessageLength + saveMessage_fid.length; i++) {
+      document.getElementById(i).addEventListener('click', function(i) {
+        answerMessage.classList.remove('vjs-chat_hidden');
+        toAnswer = videoJs.querySelectorAll('.vjs-chat__message')[i].innerHTML;
+      }.bind(this, i));
+    };
+    answerMessage.onclick = function() {
+      toAnswer = '';
+      answerMessage.classList.add('vjs-chat_hidden');
+    };
+  };
+  OnclickAnswer();
 };
 
 videojs.registerPlugin('ExamplePlugin', ExamplePlugin);
