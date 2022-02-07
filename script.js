@@ -15,7 +15,6 @@ class ChatComponent extends Component {
     return `
       <div class="vjs-chat__pinned-message vjs-chat_hidden"></div>
       <div class="vjs-chat__messages-container"></div>
-
       <div class="vjs-chat__registr-container">
         <input class="vjs-chat__input-username" type="text" placeholder="User">
         <div class="vjs-chat__button-login">login</div>
@@ -23,7 +22,6 @@ class ChatComponent extends Component {
           <input class="vjs-chat__input-admin" id="admin" type="checkbox">Admin
         </label>
       </div>
-
       <div class="vjs-chat__send-messages-container vjs-chat_hidden">
         <div class="vjs-chat__contaiher-textarea">
           <div class="vjs-chat__button-load">
@@ -95,7 +93,6 @@ function ExamplePlugin() {
   let isPinned = videoJs.querySelector('.vjs-chat__pinned-message');
   let inputDownload = videoJs.querySelector('.vjs-chat__input-download-ava');
   let isAdmin = videoJs.querySelector('.vjs-chat__input-admin');
-  let saveMessage = JSON.parse( localStorage.getItem('messageList') );
   let saveAvatar = JSON.parse( localStorage.getItem('messageAva') );
   let saveUser = JSON.parse( localStorage.getItem('Username') );
   let savePinnedMessage = JSON.parse( localStorage.getItem('Pinned') );
@@ -104,65 +101,66 @@ function ExamplePlugin() {
   let admin = false;
   let readerImg = '';
   let themeMessage = '';
+  let answerIndex = null;
 
-  function SaveMessageFid(){
-    if (saveMessage_fid != null){
+  function SaveMessageFid() {
+    if (saveMessage_fid != null) {
       for (var i = messageArray_fid.length; i < saveMessage_fid.length; i++){
       messageArray_fid.push(saveMessage_fid[i]);
+      localStorage.setItem( 'messageList_fid', JSON.stringify(messageArray_fid) );
       };
+    } else {
+      localStorage.setItem( 'messageList_fid', JSON.stringify(messageArray_fid) );
     };
-    localStorage.setItem( 'messageList_fid', JSON.stringify(messageArray_fid) );
-    return saveMessage_fid;
+    return JSON.parse( localStorage.getItem('messageList_fid') );
   };
-  SaveMessageFid()
+  SaveMessageFid();
+  saveMessage_fid = JSON.parse( localStorage.getItem('messageList_fid') );
 
   let id = 0;
-
-  chatContainer.scrollTop = chatContainer.scrollHeight;
 
   if (saveMessage_fid != null) {
     id = saveMessage_fid.length;
     for (var i = 0; i < saveMessage_fid.length; i++) {
-      function AddMessages(i){
       if (saveMessage_fid[i].answerTo == null) {
         chatContainer.innerHTML += `<div class="vjs-chat__container-fullmessage">
         <div class="vjs-chat__img-ava"></div>
         <div class="vjs-chat__message vjs-chat__message_${ i }">${saveMessage_fid[i].userName}</br>${saveMessage_fid[i].message}</div>
         <img src="img/otvet2.png" class="vjs-chat__img-answer" alt="answer" id="${ i }" title="Ответить">`;
-        } else if (saveMessage_fid[i].answerTo != null) {
-          for (var j = 0; j < saveMessage_fid.length; j++) {
-            if (saveMessage_fid[i].answerTo == j) {
-                chatContainer.innerHTML += `
-                <div class="vjs-chat__container-fullmessage">
-                <div class="vjs-chat__img-ava"></div>
-                <div class="vjs-chat__message vjs-chat__message_${ i }"><div class="vjs-chat__message_answer">
-                ${saveMessage_fid[j].userName}</br>${saveMessage_fid[j].message}</div>
-                ${saveMessage_fid[i].userName}</br>${saveMessage_fid[i].message}</div>
-                <img src="img/otvet2.png" class="vjs-chat__img-answer" id="${ i }" alt="answer" title="Ответить">`;
-            };
+      } else if (saveMessage_fid[i].answerTo != null) {
+        for (var j = 0; j < saveMessage_fid.length; j++) {
+          if (saveMessage_fid[i].answerTo == j) {
+            chatContainer.innerHTML += `
+            <div class="vjs-chat__container-fullmessage">
+            <div class="vjs-chat__img-ava"></div>
+            <div class="vjs-chat__message vjs-chat__message_${ i }"><div class="vjs-chat__message_answer">
+            ${saveMessage_fid[j].userName}</br>${saveMessage_fid[j].message}</div>
+            ${saveMessage_fid[i].userName}</br>${saveMessage_fid[i].message}</div>
+             <img src="img/otvet2.png" class="vjs-chat__img-answer" id="${ i }" alt="answer" title="Ответить">`;
           };
         };
+      };
 
-        if (saveMessage_fid[i].avatar != null) {
-            messAva[i].style.backgroundImage = 'url(' + saveMessage_fid[i].avatar + ')';
-        };
+      if (saveMessage_fid[i].avatar != null) {
+        messAva[i].style.backgroundImage = 'url(' + saveMessage_fid[i].avatar + ')';
+      };
 
-        let chatMessage =  videoJs.querySelectorAll('.vjs-chat__message');
-        if (saveMessage_fid[i].isAdmin == true) {
-            chatMessage[i].classList.add('vjs-chat_theme_admin');
-        } else {
-            chatMessage[i].classList.add('vjs-chat_theme');
-        };
+      let chatMessage =  videoJs.querySelectorAll('.vjs-chat__message');
+      if (saveMessage_fid[i].isAdmin == true) {
+        chatMessage[i].classList.add('vjs-chat_theme_admin');
+      } else {
+        chatMessage[i].classList.add('vjs-chat_theme');
+      };
 
-        if (saveMessage_fid[i].isPinned == true) {
-            isPinned.classList.remove('vjs-chat_hidden');
-            isPinned.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
-            <div class="vjs-chat_pinned-line">${chatMessage[i].innerHTML}<div>`;
-        };
-      }; AddMessages(i);
+      if (saveMessage_fid[i].isPinned == true) {
+        isPinned.classList.remove('vjs-chat_hidden');
+        isPinned.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
+        <div class="vjs-chat_pinned-line">${chatMessage[i].innerHTML}<div>`;
+      };
     };
   };
 
+  chatContainer.scrollTop = chatContainer.scrollHeight;
 
   if (vjsChat.parentElement.clientWidth >= 1280) { //размер чата в зависимостти от ширины плеера
     vjsChat.classList.add('vjs-chat_width-deskstop');
@@ -172,8 +170,8 @@ function ExamplePlugin() {
     vjsChat.classList.add('vjs-chat_width-mobile');
   };
 
-//   vjsChat.classList.add('vjs-chat_hidden');
-  console.log(savePinnedMessage)
+  vjsChat.classList.add('vjs-chat_hidden');
+
   if (savePinnedMessage != null) {
     if (savePinnedMessage.isPinnedContetnt != '') {
       isPinned.classList.remove('vjs-chat_hidden');
@@ -184,24 +182,24 @@ function ExamplePlugin() {
   function AdminChange() {
     isAdmin.onchange = function() {
       if (isAdmin.checked) {
-      admin = true;
+        admin = true;
       };
     };
     return admin;
   };
 
-  if (saveMessage_fid != null) {
+
   if (saveMessage_fid.length == messageArrayFidInt) {
     id = saveMessage_fid.length;
   } else {
     videoJs.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat_hidden');
     videoJs.querySelector('.vjs-chat__registr-container').classList.add('vjs-chat_hidden');
-  };}
+  };
   if (saveAvatar != null) {
     btnLoad.style.backgroundImage = saveAvatar.avatar;
   };
 
-  this.on('playing', function() {
+  this.one('playing', function() {
     vjsChat.classList.remove('vjs-chat_hidden');
 
     let myButton = this.controlBar.addChild("button"); //добавление кнопки открытия/закрытия чата
@@ -218,9 +216,7 @@ function ExamplePlugin() {
         myButtonDom.querySelector('svg').setAttribute("fill", "rgb(85, 85, 209");
       };
     };
-    this.on = null;
-    OnclickAnswer();
-   });
+  });
 
   saveImg = ( {'avatar': btnLoad.style.backgroundImage} );
   localStorage.setItem( 'messageAva', JSON.stringify(saveImg) );
@@ -240,8 +236,11 @@ function ExamplePlugin() {
         btnLoad.style.backgroundImage = "url('img/default_ava.png')";
       };
     };
-    return saveAvatar;
+    return JSON.parse( localStorage.getItem('messageAva') );
   };
+  SaveAva();
+
+  saveAvatar = JSON.parse( localStorage.getItem('messageAva') );
 
   textareaMessage.onclick = function() {
     this.textContent = '';
@@ -261,18 +260,17 @@ function ExamplePlugin() {
   };
 
   let messAvan = videoJs.getElementsByClassName('vjs-chat__img-ava');//аватарка в сообщениях
-    if (saveMessage_fid != null){
-      for (var n = messageArrayFidInt; n < saveMessage_fid.length; n++) {
-        if (saveAvatar != null) {
-            messAvan[n].style.backgroundImage = saveAvatar.avatar;
-        } else {
-            messAvan[n].style.backgroundImage = 'url(img/default_ava.png)';
-        };
-      };
+
+  for (var n = messageArrayFidInt; n < saveMessage_fid.length; n++) {
+    if (saveAvatar != null) {
+      messAvan[n].style.backgroundImage = saveAvatar.avatar;
+    } else {
+      messAvan[n].style.backgroundImage = 'url(img/default_ava.png)';
     };
+  };
 
   let messageContent = '';
-  function MessegeContent(){
+  function MessegeContent() {
     saveUser = JSON.parse( localStorage.getItem('Username') );
     if (saveUser == null) {
       if (admin == true) {
@@ -310,7 +308,6 @@ function ExamplePlugin() {
   OnclickPinned();
 
   textareaMessage.onkeyup = function(ent) { //отправка по enter
-    OnclickAnswer();
     if(ent.keyCode==13) {
       let answerMessage = videoJs.querySelector('.vjs-chat__container-answer-message');
       answerMessage.classList.add('vjs-chat_hidden');
@@ -334,7 +331,9 @@ function ExamplePlugin() {
           messAva[i].style.backgroundImage = saveAvatar.avatar;
         };
       };
-      id += 1
+      id += 1;
+      SaveMessageFid();
+      saveMessage_fid = JSON.parse( localStorage.getItem('messageList_fid') );
     };
     OnclickPinned();
     OnclickAnswer();
@@ -374,7 +373,6 @@ function ExamplePlugin() {
   };
   OnclickPinned();
 
-  let answerIndex = null;
   let toAnswer= '';
   function OnclickAnswer() {
     let answerMessage = videoJs.querySelector('.vjs-chat__container-answer-message');
