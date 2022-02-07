@@ -405,4 +405,3 @@ videojs('video-exam', {
     ExamplePlugin: true
   },
 });
-
