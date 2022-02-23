@@ -38,9 +38,10 @@ class ChatComponent extends Component {
 Component.registerComponent('ChatComponent', ChatComponent);
 
 function ChatPlugin() {
+  'use strict';
   this.addChild('ChatComponent');
 
-  videoEl = this.el();
+  var videoEl = this.el();
 
 
   var videoContainer = videojs.createEl('div', {
@@ -48,6 +49,7 @@ function ChatPlugin() {
   });
   videoEl.parentNode.insertBefore(videoContainer, videoEl);
   videoContainer.appendChild(videoEl);
+  // this.addClass('chat-plugin');
 
   let saveImg = [];
   let user = [];
@@ -87,7 +89,7 @@ function ChatPlugin() {
 		}
   ];
 
-  let messageArrayFeedCount = messageArrayFeed.length;
+  let messageArrayFeedLength = messageArrayFeed.length;
 
   let messagesAvatar = videoEl.getElementsByClassName('vjs-chat__img-ava');
   let vjsChat = videoEl.querySelector('.vjs-chat');
@@ -102,7 +104,7 @@ function ChatPlugin() {
   let saveAvatar = JSON.parse( localStorage.getItem('messageAva') );
   let saveUser = JSON.parse( localStorage.getItem('Username') );
   let savePinnedMessage = JSON.parse( localStorage.getItem('Pinned') );
-  let storageMessage = JSON.parse( localStorage.getItem('messageList_fid') );
+  let storageMessage = JSON.parse( localStorage.getItem('messageList') );
 
   let admin = false;
   let readerImg = '';
@@ -113,15 +115,15 @@ function ChatPlugin() {
     if (storageMessage != null) {
       for (var i = messageArrayFeed.length; i < storageMessage.length; i++){
       messageArrayFeed.push(storageMessage[i]);
-      localStorage.setItem( 'messageList_fid', JSON.stringify(messageArrayFeed) );
+      localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
       };
     } else {
-      localStorage.setItem( 'messageList_fid', JSON.stringify(messageArrayFeed) );
+      localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
     };
-    return JSON.parse( localStorage.getItem('messageList_fid') );
+    return JSON.parse( localStorage.getItem('messageList') );
   };
   FillingStorageMessage();
-  storageMessage = JSON.parse( localStorage.getItem('messageList_fid') );
+  storageMessage = JSON.parse( localStorage.getItem('messageList') );
 
   let id = storageMessage.length;
 
@@ -132,7 +134,7 @@ function ChatPlugin() {
       <div class="vjs-chat__message vjs-chat__message_${ i }">${storageMessage[i].userName}</br>${storageMessage[i].message}</div>
       <img src="img/otvet2.png" class="vjs-chat__img-answer" alt="answer" id="${ i }" title="Ответить">`;
     } else {
-      j = storageMessage[i].answerTo;
+      let j = storageMessage[i].answerTo;
       chatContainer.innerHTML += `
       <div class="vjs-chat__container-fullmessage">
       <div class="vjs-chat__img-ava"></div>
@@ -162,7 +164,7 @@ function ChatPlugin() {
 
   chatContainer.scrollTop = chatContainer.scrollHeight;
 
-  // vjsChat.classList.add('vjs-chat_hidden');
+  vjsChat.classList.add('vjs-chat_hidden');
 
   if (savePinnedMessage?.isPinnedContent) {
     isPinned.classList.remove('vjs-chat_hidden');
@@ -181,7 +183,7 @@ function ChatPlugin() {
   };
   AdminChange();
 
-  if (storageMessage.length === messageArrayFeedCount) {
+  if (storageMessage.length === messageArrayFeedLength) {
     id = storageMessage.length;
   } else {
     videoEl.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat_hidden');
@@ -194,10 +196,10 @@ function ChatPlugin() {
   this.one('playing', function() {
     vjsChat.classList.remove('vjs-chat_hidden');
 
-    let chatDisplayBtn = this.controlBar.addChild("button"); //добавление кнопки открытия/закрытия чата
+    let chatDisplayBtn = this.controlBar.addChild("button"), //добавление кнопки открытия/закрытия чата
     chatDisplayBtnEl = chatDisplayBtn.el();
     chatDisplayBtnEl.innerHTML = '<svg class="vjs-svg-use-button" width="70%" height="70%" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><use class="vjs-chat__svg-use-button" xlink:href="icon.svg#icon_1"/></svg>';
-    svgBttn = chatDisplayBtnEl.querySelector('svg');
+    let svgBttn = chatDisplayBtnEl.querySelector('svg');
     svgBttn.onclick = function() {
       if (vjsChat.classList.contains('vjs-chat_hidden')) {
         svgBttn.classList.remove("vjs-svg-use-button_color");//изменение цвета иконкиы
@@ -245,7 +247,7 @@ function ChatPlugin() {
       videoEl.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat_hidden');
   };
 
-  for (var n = messageArrayFeedCount; n < storageMessage.length; n++) {//аватарка в сообщениях
+  for (var n = messageArrayFeedLength; n < storageMessage.length; n++) {//аватарка в сообщениях
     if (saveAvatar != null) {
       messagesAvatar[n].style.backgroundImage = saveAvatar.avatar;
     } else {
@@ -300,7 +302,7 @@ function ChatPlugin() {
       messageArrayFeed.push( {'id':id, 
       'message': textareaMessage.textContent, 'avatar': saveAvatar.avatar, "userName": saveUser.userName, 
       "isAdmin": saveUser.isAdmin, "isPinned": false, "answerTo": answerIndex});
-      localStorage.setItem( 'messageList_fid', JSON.stringify(messageArrayFeed) );
+      localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
 
       chatContainer.innerHTML += messageContent;
       chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -308,7 +310,7 @@ function ChatPlugin() {
 
       id += 1;
       FillingStorageMessage();
-      storageMessage = JSON.parse( localStorage.getItem('messageList_fid') );
+      storageMessage = JSON.parse( localStorage.getItem('messageList') );
     };
     FillingStoragePinnedMessage();
     FillingStorageAnswerMessage();
@@ -329,7 +331,7 @@ function ChatPlugin() {
         messageArrayFeed[i].isPinned = true;
         isPinnedMessage = storageMessage[i];
         localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":isPinned.innerHTML}) );
-        localStorage.setItem( 'messageList_fid', JSON.stringify(messageArrayFeed) );
+        localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
       }.bind(this, i));
     };
     isPinned.onclick = function() {
@@ -340,7 +342,7 @@ function ChatPlugin() {
         if (storageMessage[i] === isPinnedMessage) {
           messageArrayFeed[i].isPinned = false;
           localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":isPinned.innerHTML}) );
-          localStorage.setItem( 'messageList_fid', JSON.stringify(messageArrayFeed) );
+          localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
         };
       };
     };
@@ -362,7 +364,7 @@ function ChatPlugin() {
       toAnswer = '';
       answerMessage.classList.add('vjs-chat_hidden');
       messageArrayFeed[answerIndex].toAnswer = null;
-      localStorage.setItem( 'messageList_fid', JSON.stringify(messageArrayFeed) );
+      localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
     };
     return answerIndex;
   };
