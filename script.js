@@ -43,14 +43,6 @@ function ChatPlugin() {
 
   var videoEl = this.el();
 
-
-  var videoContainer = videojs.createEl('div', {
-    className: 'chat-plugin',
-  });
-  videoEl.parentNode.insertBefore(videoContainer, videoEl);
-  videoContainer.appendChild(videoEl);
-  // this.addClass('chat-plugin');
-
   let saveImg = [];
   let user = [];
   let messageArrayFeed = [

@@ -2,13 +2,8 @@ html, body {
     margin: 0;
 }
 
-.chat-plugin {
-    margin: 0 auto;
-    width: 80%;
-    max-width: 1300px;
-    min-width: 500px;
+.video-js {
     margin-top: 25px;
-    height: auto;
 }
 
 .vjs-chat {
@@ -56,7 +51,7 @@ html, body {
         width: 100%;
     }
     .vjs-chat__messages-container {
-        height: 70%;
+        height: 50%;
     }
 }
 
