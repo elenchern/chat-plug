@@ -1,3 +1,4 @@
+'use strict';
 const Component = videojs.getComponent('Component');
 let id = 0;
 class ChatComponent extends Component {
@@ -38,14 +39,13 @@ class ChatComponent extends Component {
 Component.registerComponent('ChatComponent', ChatComponent);
 
 function ChatPlugin() {
-  'use strict';
   this.addChild('ChatComponent');
 
-  var videoEl = this.el();
+  let videoEl = this.el(),
 
-  let saveImg = [];
-  let user = [];
-  let messageArrayFeed = [
+  saveImg = new Object,
+  user = new Object,
+  messageArrayFeed = [
     {
 			"id": "0",
 			"userName": "Admin",
@@ -79,60 +79,56 @@ function ChatPlugin() {
 			"avatar": null,
 			"answerTo": "2"
 		}
-  ];
+  ],
 
-  let messageArrayFeedLength = messageArrayFeed.length;
+  messageArrayFeedLength = messageArrayFeed.length,
+  messagesAvatar = videoEl.getElementsByClassName('vjs-chat__img-ava'),
+  vjsChat = videoEl.querySelector('.vjs-chat'),
+  textareaMessage = videoEl.querySelector('.vjs-chat__textarea'),
+  chatContainer = videoEl.querySelector('.vjs-chat__messages-container'),
+  btnLogin = videoEl.querySelector('.vjs-chat__button-login'),
+  inputUsername = videoEl.querySelector('.vjs-chat__input-username'),
+  btnLoad = videoEl.querySelector('.vjs-chat__button-load'),
+  pinnedMessageContainer = videoEl.querySelector('.vjs-chat__pinned-message'),
+  inputDownload = videoEl.querySelector('.vjs-chat__input-download-ava'),
+  adminEl = videoEl.querySelector('.vjs-chat__input-admin'),
+  saveAvatar = JSON.parse( localStorage.getItem('messageAva') ),
+  saveUser = JSON.parse( localStorage.getItem('Username') ),
+  savePinnedMessage = JSON.parse( localStorage.getItem('Pinned') ),
+  storageMessage = JSON.parse( localStorage.getItem('messageList') ),
+  admin = false,
+  readerImg = '',
+  themeMessage = '',
+  answerIndex = null;
 
-  let messagesAvatar = videoEl.getElementsByClassName('vjs-chat__img-ava');
-  let vjsChat = videoEl.querySelector('.vjs-chat');
-  let textareaMessage = videoEl.querySelector('.vjs-chat__textarea');
-  let chatContainer = videoEl.querySelector('.vjs-chat__messages-container');
-  let btnLogin = videoEl.querySelector('.vjs-chat__button-login');
-  let inputUsername = videoEl.querySelector('.vjs-chat__input-username');
-  let btnLoad = videoEl.querySelector('.vjs-chat__button-load');
-  let isPinned = videoEl.querySelector('.vjs-chat__pinned-message');
-  let inputDownload = videoEl.querySelector('.vjs-chat__input-download-ava');
-  let adminEl = videoEl.querySelector('.vjs-chat__input-admin');
-  let saveAvatar = JSON.parse( localStorage.getItem('messageAva') );
-  let saveUser = JSON.parse( localStorage.getItem('Username') );
-  let savePinnedMessage = JSON.parse( localStorage.getItem('Pinned') );
-  let storageMessage = JSON.parse( localStorage.getItem('messageList') );
-
-  let admin = false;
-  let readerImg = '';
-  let themeMessage = '';
-  let answerIndex = null;
-
-  function FillingStorageMessage() {
-    if (storageMessage != null) {
-      for (var i = messageArrayFeed.length; i < storageMessage.length; i++){
-      messageArrayFeed.push(storageMessage[i]);
-      localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
-      };
-    } else {
-      localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
-    };
-    return JSON.parse( localStorage.getItem('messageList') );
+  if (storageMessage != null) {
+    let storageMessageSlice = storageMessage.slice(messageArrayFeed.length);
+    messageArrayFeed = messageArrayFeed.concat(storageMessageSlice);
   };
-  FillingStorageMessage();
+  localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
   storageMessage = JSON.parse( localStorage.getItem('messageList') );
 
   let id = storageMessage.length;
 
-  for (var i = 0; i < storageMessage.length; i++) {
-    if (storageMessage[i].answerTo == null) {
-      chatContainer.innerHTML += `<div class="vjs-chat__container-fullmessage">
-      <div class="vjs-chat__img-ava"></div>
-      <div class="vjs-chat__message vjs-chat__message_${ i }">${storageMessage[i].userName}</br>${storageMessage[i].message}</div>
-      <img src="img/otvet2.png" class="vjs-chat__img-answer" alt="answer" id="${ i }" title="Ответить">`;
-    } else {
-      let j = storageMessage[i].answerTo;
+  for (let i = 0; i < storageMessage.length; i++) {
+    if (storageMessage[i].answerTo === null) {
       chatContainer.innerHTML += `
       <div class="vjs-chat__container-fullmessage">
-      <div class="vjs-chat__img-ava"></div>
-      <div class="vjs-chat__message vjs-chat__message_${ i }"><div class="vjs-chat__message_answer">
-      ${storageMessage[j].userName}</br>${storageMessage[j].message}</div>
-      ${storageMessage[i].userName}</br>${storageMessage[i].message}</div>
+        <div class="vjs-chat__img-ava"></div>
+        <div class="vjs-chat__message vjs-chat__message_${ i }">${storageMessage[i].userName}</br>${storageMessage[i].message}
+      </div>
+      <img src="img/otvet2.png" class="vjs-chat__img-answer" alt="answer" id="${ i }" title="Ответить">`;
+    } else {
+      let indexMessageAnswerTo = storageMessage[i].answerTo;
+      chatContainer.innerHTML += `
+      <div class="vjs-chat__container-fullmessage">
+        <div class="vjs-chat__img-ava"></div>
+          <div class="vjs-chat__message vjs-chat__message_${ i }">
+          <div class="vjs-chat__message_answer">
+          ${storageMessage[indexMessageAnswerTo].userName}</br>${storageMessage[indexMessageAnswerTo].message}
+        </div>
+        ${storageMessage[i].userName}</br>${storageMessage[i].message}
+      </div>
       <img src="img/otvet2.png" class="vjs-chat__img-answer" id="${ i }" alt="answer" title="Ответить">`;
     };
 
@@ -140,7 +136,7 @@ function ChatPlugin() {
       messagesAvatar[i].style.backgroundImage = 'url(' + storageMessage[i].avatar + ')';
     };
 
-    let chatMessage =  videoEl.querySelectorAll('.vjs-chat__message');
+    let chatMessage = videoEl.querySelectorAll('.vjs-chat__message');
     if (storageMessage[i].isAdmin) {
       chatMessage[i].classList.add('vjs-chat_theme_admin');
     } else {
@@ -148,32 +144,28 @@ function ChatPlugin() {
     };
 
     if (storageMessage[i].isPinned) {
-      isPinned.classList.remove('vjs-chat_hidden');
-      isPinned.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
+      pinnedMessageContainer.classList.remove('vjs-chat_hidden');
+      pinnedMessageContainer.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
       <div class="vjs-chat_pinned-line">${chatMessage[i].innerHTML}<div>`;
     };
   };
 
   chatContainer.scrollTop = chatContainer.scrollHeight;
 
-  vjsChat.classList.add('vjs-chat_hidden');
+  // vjsChat.classList.add('vjs-chat_hidden');
 
   if (savePinnedMessage?.isPinnedContent) {
-    isPinned.classList.remove('vjs-chat_hidden');
-    isPinned.innerHTML = savePinnedMessage.isPinnedContent;
+    pinnedMessageContainer.classList.remove('vjs-chat_hidden');
+    pinnedMessageContainer.innerHTML = savePinnedMessage.isPinnedContent;
   } else {
-    isPinned.classList.add('vjs-chat_hidden');
+    pinnedMessageContainer.classList.add('vjs-chat_hidden');
   };
 
-  function AdminChange() {
-    adminEl.onchange = function() {
-      if (adminEl.checked) {
-        admin = true;
-      };
+  adminEl.onchange = function() {
+    if (adminEl.checked) {
+      admin = true;
     };
-    return admin;
   };
-  AdminChange();
 
   if (storageMessage.length === messageArrayFeedLength) {
     id = storageMessage.length;
@@ -193,7 +185,7 @@ function ChatPlugin() {
     chatDisplayBtnEl.innerHTML = '<svg class="vjs-svg-use-button" width="70%" height="70%" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><use class="vjs-chat__svg-use-button" xlink:href="icon.svg#icon_1"/></svg>';
     let svgBttn = chatDisplayBtnEl.querySelector('svg');
     svgBttn.onclick = function() {
-      if (vjsChat.classList.contains('vjs-chat_hidden')) {
+      if ( vjsChat.classList.contains('vjs-chat_hidden') ) {
         svgBttn.classList.remove("vjs-svg-use-button_color");//изменение цвета иконкиы
         vjsChat.classList.remove('vjs-chat_hidden');
       } else {
@@ -206,7 +198,7 @@ function ChatPlugin() {
   saveImg = ( {'avatar': btnLoad.style.backgroundImage} );
   localStorage.setItem( 'messageAva', JSON.stringify(saveImg) );
 
-  function FillingStorageAva() {
+  function fillingStorageAva() {
     inputDownload.onchange = function() { //загрузка и сохранение аватарки
       let file = videoEl.querySelector('input[type=file]').files[0];
       readerImg = new FileReader();
@@ -221,25 +213,24 @@ function ChatPlugin() {
         btnLoad.style.backgroundImage = "url('img/default_ava.png')";
       };
     };
-    return JSON.parse( localStorage.getItem('messageAva') );
+    saveAvatar = JSON.parse( localStorage.getItem('messageAva') );
+    return saveAvatar;
   };
-  FillingStorageAva();
-
-  saveAvatar = JSON.parse( localStorage.getItem('messageAva') );
+  fillingStorageAva();
 
   textareaMessage.onclick = function() {
     this.textContent = '';
     this.onclick = null;
   };
 
-    btnLogin.onclick = function() {//сохранение имя пользователя, показ чата
-      user = ( {'userName': inputUsername.value, 'isAdmin': admin} );
-      localStorage.setItem( 'Username', JSON.stringify(user) );
-      videoEl.querySelector('.vjs-chat__registr-container').classList.add('vjs-chat_hidden');
-      videoEl.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat_hidden');
+  btnLogin.onclick = function() {//сохранение имя пользователя, показ чата
+    user = ( {'userName': inputUsername.value, 'isAdmin': admin} );
+    localStorage.setItem( 'Username', JSON.stringify(user) );
+    videoEl.querySelector('.vjs-chat__registr-container').classList.add('vjs-chat_hidden');
+    videoEl.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat_hidden');
   };
 
-  for (var n = messageArrayFeedLength; n < storageMessage.length; n++) {//аватарка в сообщениях
+  for (let n = messageArrayFeedLength; n < storageMessage.length; n++) {//аватарка в сообщениях
     if (saveAvatar != null) {
       messagesAvatar[n].style.backgroundImage = saveAvatar.avatar;
     } else {
@@ -248,9 +239,9 @@ function ChatPlugin() {
   };
 
   let messageContent = '';
-  function MessegeContent() {
+  function fillingMessageContent() {
     saveUser = JSON.parse( localStorage.getItem('Username') );
-    if (saveUser == null) {
+    if (saveUser === null) {
       if (admin) {
         themeMessage = 'vjs-chat_theme_admin';
       } else {
@@ -264,32 +255,34 @@ function ChatPlugin() {
       };
     };
 
-    if (toAnswer == '') {
-        messageContent = `
-        <div class="vjs-chat__container-fullmessage">
-          <div class="vjs-chat__img-ava"></div>
-          <div class="vjs-chat__message ${themeMessage} vjs-chat__message_${id}"> ${saveUser.userName}</br>
-          ${textareaMessage.textContent}</div>
-        <img src="img/otvet2.png" class="vjs-chat__img-answer" id="${videoEl.querySelectorAll('.vjs-chat__message').length }" alt="answer" title="Ответить">`;
-      } else {
+    if (toAnswer === '') {
+      messageContent = `
+      <div class="vjs-chat__container-fullmessage">
+        <div class="vjs-chat__img-ava"></div>
+        <div class="vjs-chat__message ${themeMessage} vjs-chat__message_${id}"> ${saveUser.userName}</br>
+        ${textareaMessage.textContent}
+      </div>
+      <img src="img/otvet2.png" class="vjs-chat__img-answer" id="${videoEl.querySelectorAll('.vjs-chat__message').length }" alt="answer" title="Ответить">`;
+    } else {
       messageContent = `
       <div class="vjs-chat__container-fullmessage">
         <div class="vjs-chat__img-ava"></div>
         <div class="vjs-chat__message ${themeMessage} vjs-chat__message_${id}"><div class="vjs-chat__message_answer">
         ${toAnswer}</div>
-        ${saveUser.userName}</br>${textareaMessage.textContent}</div>
+        ${saveUser.userName}</br>${textareaMessage.textContent}
+      </div>
       <img src="img/otvet2.png" class="vjs-chat__img-answer" id="${videoEl.querySelectorAll('.vjs-chat__message').length }" alt="answer" title="Ответить">`;
     };
     return messageContent;
   };
 
   textareaMessage.onkeyup = function(ent) {//отправка по enter
-    if(ent.keyCode == 13) {
+    if(ent.keyCode === 13) {
       let answerMessage = videoEl.querySelector('.vjs-chat__container-answer-message');
       answerMessage.classList.add('vjs-chat_hidden');
 
-      FillingStorageAva();
-      MessegeContent();
+      fillingStorageAva();
+      fillingMessageContent();
 
       messageArrayFeed.push( {'id':id, 
       'message': textareaMessage.textContent, 'avatar': saveAvatar.avatar, "userName": saveUser.userName, 
@@ -301,56 +294,57 @@ function ChatPlugin() {
       textareaMessage.textContent = '';
 
       id += 1;
-      FillingStorageMessage();
       storageMessage = JSON.parse( localStorage.getItem('messageList') );
     };
-    FillingStoragePinnedMessage();
-    FillingStorageAnswerMessage();
+    fillingStoragePinnedMessage();
+    fillingStorageAnswerMessage();
 
     let answerMessage = videoEl.querySelector('.vjs-chat__container-answer-message');
-    if ( answerMessage.classList.length == 2){toAnswer = '';};
+    if ( answerMessage.classList.length === 2) {
+      toAnswer = '';
+    };
   };
 
-  function FillingStoragePinnedMessage() {
-    let divMessage = videoEl.getElementsByClassName('vjs-chat__message');
-    let isPinnedMessage = '';
-    for (var i=0; i < divMessage.length; i++) {
-      videoEl.querySelector('.vjs-chat__message_'+i).addEventListener('click', function(i) {
-        isPinned.classList.remove('vjs-chat_hidden');
-        isPinned.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
+  function fillingStoragePinnedMessage() {
+    let divMessage = videoEl.getElementsByClassName('vjs-chat__message'),
+    pinnedMessage = '';
+    for (let i=0; i < divMessage.length; i++) {
+      videoEl.querySelector('.vjs-chat__message_'+i).addEventListener('click', function() {
+        pinnedMessageContainer.classList.remove('vjs-chat_hidden');
+        pinnedMessageContainer.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
         <div class="vjs-chat_pinned-line">${storageMessage[i].userName}<br>${storageMessage[i].message}`;
 
         messageArrayFeed[i].isPinned = true;
-        isPinnedMessage = storageMessage[i];
-        localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":isPinned.innerHTML}) );
+        pinnedMessage = storageMessage[i];
+        localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":pinnedMessageContainer.innerHTML}) );
         localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
-      }.bind(this, i));
+      });
     };
-    isPinned.onclick = function() {
+    pinnedMessageContainer.onclick = function() {
       this.classList.add('vjs-chat_hidden');
-      isPinned.innerHTML = '';
-      localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":isPinned.innerHTML}) );
-      for (var i=0; i < divMessage.length; i++) {
-        if (storageMessage[i] === isPinnedMessage) {
+      pinnedMessageContainer.innerHTML = '';
+      localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":pinnedMessageContainer.innerHTML}) );
+      for (let i=0; i < divMessage.length; i++) {
+        if (storageMessage[i] === pinnedMessage) {
           messageArrayFeed[i].isPinned = false;
-          localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":isPinned.innerHTML}) );
+          localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":pinnedMessageContainer.innerHTML}) );
           localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
         };
       };
     };
     return savePinnedMessage;
   };
-  FillingStoragePinnedMessage();
+  fillingStoragePinnedMessage();
 
   let toAnswer= '';
-  function FillingStorageAnswerMessage() {
+  function fillingStorageAnswerMessage() {
     let answerMessage = videoEl.querySelector('.vjs-chat__container-answer-message');
-    for (var i=0; i < storageMessage.length; i++) {
-      document.getElementById(i).addEventListener('click', function(i) {
+    for (let i=0; i < storageMessage.length; i++) {
+      document.getElementById(i).addEventListener('click', function() {
         answerMessage.classList.remove('vjs-chat_hidden');
         toAnswer = videoEl.querySelectorAll('.vjs-chat__message')[i].innerHTML;
         answerIndex = i;
-      }.bind(this, i));
+      });
     };
     answerMessage.onclick = function() {
       toAnswer = '';
@@ -360,7 +354,7 @@ function ChatPlugin() {
     };
     return answerIndex;
   };
-  FillingStorageAnswerMessage();
+  fillingStorageAnswerMessage();
 };
 
 videojs.registerPlugin('ChatPlugin', ChatPlugin);
