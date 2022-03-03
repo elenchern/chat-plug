@@ -329,3 +329,19 @@ html, body {
 .vjs-svg-use-button_color {
     fill: rgb(85, 85, 209);
 }
+
+.vjs-chat__container-answer-message_hidden {
+    visibility: hidden;
+}
+
+.vjs-chat__send-messages-container_hidden {
+    visibility: hidden;
+}
+
+.vjs-chat__pinned-message_hidden {
+    visibility: hidden;
+}
+
+.vjs-chat__registr-container_hidden {
+    visibility: hidden;
+}
