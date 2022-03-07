@@ -41,125 +41,71 @@ function ChatPlugin() {
   this.addChild('ChatComponent');
 
   let videoEl = this.el(),
-
-  saveImg = {},
-  user = {},
-  messageArrayFeed = [
-    {
-			"id": "0",
-			"userName": "Admin",
-			"isPinned": true,
-			"isAdmin": true,
-			"message":" Дополнительная скидка 15% по промокоду ВЕСНА15",
-			"avatar": "https://cdn-icons-png.flaticon.com/512/194/194938.png",
-			"answerTo": null
-		}, {
-			"id": "1",
-			"userName": "Костя Морозов",
-			"isPinned": false,
-			"isAdmin": false,
-			"message": "Надюша начинай",
-			"avatar": "https://www.pngarts.com/files/5/User-Avatar-PNG-Free-Download.png",
-			"answerTo": null
-		 }, {
-			"id": "2",
-			"userName": "Рузанна Комиссарова",
-			"isPinned": false,
-			"isAdmin": false,
-			"message": "Здравствуйте, как купить туфли",
-			"avatar": null,
-			"answerTo": null
-		}, {
-			"id": "3",
-			"userName": "Admin",
-			"isPinned": false,
-			"isAdmin": true,
-			"message": "Надюша начинай",
-			"avatar": null,
-			"answerTo": "2"
-		}
-  ],
-
-  messageArrayFeedLength = messageArrayFeed.length,
-  messagesAvatar = videoEl.getElementsByClassName('vjs-chat__img-ava'),
-  vjsChat = videoEl.querySelector('.vjs-chat'),
-  textareaMessage = videoEl.querySelector('.vjs-chat__textarea'),
-  chatContainer = videoEl.querySelector('.vjs-chat__messages-container'),
-  btnLogin = videoEl.querySelector('.vjs-chat__button-login'),
-  inputUsername = videoEl.querySelector('.vjs-chat__input-username'),
-  btnLoad = videoEl.querySelector('.vjs-chat__button-load'),
-  pinnedMessageContainer = videoEl.querySelector('.vjs-chat__pinned-message'),
-  inputDownload = videoEl.querySelector('.vjs-chat__input-download-ava'),
-  adminEl = videoEl.querySelector('.vjs-chat__input-admin'),
-  saveAvatar = JSON.parse( localStorage.getItem('messageAva') ),
-  saveUser = JSON.parse( localStorage.getItem('Username') ),
-  savePinnedMessage = JSON.parse( localStorage.getItem('Pinned') ),
-  storageMessage = JSON.parse( localStorage.getItem('messageList') ),
-  admin = false,
-  readerImg = '',
-  themeMessage = '',
-  answerIndex = null;
-
-  if (storageMessage === null) {
-    localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
-    storageMessage = JSON.parse( localStorage.getItem('messageList') );
+    saveImg = {},
+    user = {},
+    messageArrayFeed = [
+      {
+        "id": "0",
+        "userName": "Admin",
+        "isPinned": true,
+        "isAdmin": true,
+        "message":" Дополнительная скидка 15% по промокоду ВЕСНА15",
+        "avatar": "https://cdn-icons-png.flaticon.com/512/194/194938.png",
+        "answerTo": null
+      }, {
+        "id": "1",
+        "userName": "Костя Морозов",
+        "isPinned": false,
+        "isAdmin": false,
+        "message": "Надюша начинай",
+        "avatar": "https://www.pngarts.com/files/5/User-Avatar-PNG-Free-Download.png",
+        "answerTo": null
+      }, {
+        "id": "2",
+        "userName": "Рузанна Комиссарова",
+        "isPinned": false,
+        "isAdmin": false,
+        "message": "Здравствуйте, как купить туфли",
+        "avatar": null,
+        "answerTo": null
+      }, {
+        "id": "3",
+        "userName": "Admin",
+        "isPinned": false,
+        "isAdmin": true,
+        "message": "Надюша начинай",
+        "avatar": null,
+        "answerTo": "2"
+      }
+    ],
+    messageArrayFeedLength = messageArrayFeed.length,
+    messagesAvatar = videoEl.getElementsByClassName('vjs-chat__img-ava'),
+    vjsChat = videoEl.querySelector('.vjs-chat'),
+    textareaMessage = videoEl.querySelector('.vjs-chat__textarea'),
+    chatContainer = videoEl.querySelector('.vjs-chat__messages-container'),
+    btnLogin = videoEl.querySelector('.vjs-chat__button-login'),
+    inputUsername = videoEl.querySelector('.vjs-chat__input-username'),
+    btnLoad = videoEl.querySelector('.vjs-chat__button-load'),
+    pinnedMessageContainer = videoEl.querySelector('.vjs-chat__pinned-message'),
+    inputDownload = videoEl.querySelector('.vjs-chat__input-download-ava'),
+    adminEl = videoEl.querySelector('.vjs-chat__input-admin'),
+    saveAvatar = JSON.parse( localStorage.getItem('messageAva') ),
+    saveUser = JSON.parse( localStorage.getItem('Username') ),
+    savePinnedMessage = JSON.parse( localStorage.getItem('Pinned') ),
+    storageMessage = JSON.parse( localStorage.getItem('messageList') ),
+    admin = false,
+    readerImg = '',
+    themeMessage = '',
+    messageContent = '',
+    toAnswer= '',
+    answerIndex = null,
+    state = saveUser;
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  vjsChat.classList.add('vjs-chat_hidden');
+  if (storageMessage !== null) {
+    messageArrayFeed = storageMessage;
   };
-  messageArrayFeed = storageMessage;
-
-  let id = storageMessage.length;
-
-  for (let i = 0; i < storageMessage.length; i++) {
-    let indexMessageAnswerTo = storageMessage[i].answerTo;
-    let chatContainerContent = (storageMessage[i].answerTo === null) ? `${storageMessage[i].userName}</br>${storageMessage[i].message}` :
-      `<div class="vjs-chat__message_answer">${storageMessage[indexMessageAnswerTo].userName}</br>${storageMessage[indexMessageAnswerTo].message}
-      </div>${storageMessage[i].userName}</br>${storageMessage[i].message}`;
-
-    chatContainer.innerHTML += `
-      <div class="vjs-chat__container-fullmessage">
-        <div class="vjs-chat__img-ava"></div>
-        <div class="vjs-chat__message vjs-chat__message_${ i }">${chatContainerContent}</div>
-      <img src="img/otvet2.png" class="vjs-chat__img-answer" alt="answer" id="${ i }" title="Ответить">`;
-
-    if (storageMessage[i].avatar !== null) {
-      messagesAvatar[i].style.backgroundImage = 'url(' + storageMessage[i].avatar + ')';
-    };
-
-    let chatMessage = videoEl.querySelectorAll('.vjs-chat__message');
-    storageMessage[i].isAdmin ? chatMessage[i].classList.add('vjs-chat_theme_admin') : chatMessage[i].classList.add('vjs-chat_theme');
-
-    if (storageMessage[i].isPinned) {
-      pinnedMessageContainer.classList.remove('vjs-chat__pinned-message_hidden');
-      pinnedMessageContainer.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
-        <div class="vjs-chat_pinned-line">${chatMessage[i].innerHTML}<div>`;
-    };
-  };
-
-  chatContainer.scrollTop = chatContainer.scrollHeight;
-
-  // vjsChat.classList.add('vjs-chat_hidden');
-
-  if (savePinnedMessage?.isPinnedContent) {
-    pinnedMessageContainer.classList.remove('vjs-chat__pinned-message_hidden');
-    pinnedMessageContainer.innerHTML = savePinnedMessage.isPinnedContent;
-  } else if (storageMessage.length !== messageArrayFeedLength){
-    pinnedMessageContainer.classList.add('vjs-chat__pinned-message_hidden');
-  };
-
-  adminEl.onchange = function() {
-    if (adminEl.checked) {
-      admin = true;
-    };
-  };
-
-  if (storageMessage.length === messageArrayFeedLength) {
-    id = storageMessage.length;
-  } else {
-    videoEl.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat__send-messages-container_hidden');
-    videoEl.querySelector('.vjs-chat__registr-container').classList.add('vjs-chat__registr-container_hidden');
-  };
-  if (saveAvatar !== null) {
-    btnLoad.style.backgroundImage = saveAvatar.avatar;
-  };
+  let id = messageArrayFeed.length;
 
   this.one('playing', function() {
     vjsChat.classList.remove('vjs-chat_hidden');
@@ -179,83 +125,127 @@ function ChatPlugin() {
     };
   });
 
-  saveImg = ( {'avatar': btnLoad.style.backgroundImage} );
-  localStorage.setItem( 'messageAva', JSON.stringify(saveImg) );
+  function fillingStorageUser() {
+    btnLogin.onclick = function() {//сохранение имя пользователя, показ чата
+      user = ( {'userName': inputUsername.value, 'isAdmin': admin} );
+      localStorage.setItem( 'Username', JSON.stringify(user) );
+      state = user;
+      videoEl.querySelector('.vjs-chat__registr-container').classList.add('vjs-chat__registr-container_hidden');
+      videoEl.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat__send-messages-container_hidden');
+      fillingMessageContent()
+    };
+  };
+
+  function fillingChatContainer() {
+    for (let i = 0; i < messageArrayFeed.length; i++) {
+      let indexMessageAnswerTo = messageArrayFeed[i].answerTo,
+      chatContainerContent = (messageArrayFeed[i].answerTo === null) ? `${messageArrayFeed[i].userName}</br>${messageArrayFeed[i].message}` :
+        `<div class="vjs-chat__message_answer">${messageArrayFeed[indexMessageAnswerTo].userName}</br>${messageArrayFeed[indexMessageAnswerTo].message}
+        </div>${messageArrayFeed[i].userName}</br>${messageArrayFeed[i].message}`;
+
+      chatContainer.innerHTML += `
+        <div class="vjs-chat__container-fullmessage">
+          <div class="vjs-chat__img-ava"></div>
+          <div class="vjs-chat__message vjs-chat__message_${ i }">${chatContainerContent}</div>
+        <img src="img/otvet2.png" class="vjs-chat__img-answer" alt="answer" id="${ i }" title="Ответить">`;
+
+      if (messageArrayFeed[i].avatar !== null) {
+        messagesAvatar[i].style.backgroundImage = 'url(' + messageArrayFeed[i].avatar + ')';
+      };
+
+      let chatMessage = videoEl.querySelectorAll('.vjs-chat__message');
+      messageArrayFeed[i].isAdmin ? chatMessage[i].classList.add('vjs-chat_theme_admin') : chatMessage[i].classList.add('vjs-chat_theme');
+
+      if (messageArrayFeed[i].isPinned) continue;
+      pinnedMessageContainer.classList.remove('vjs-chat__pinned-message_hidden');
+      pinnedMessageContainer.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
+        <div class="vjs-chat_pinned-line">${chatMessage[i].innerHTML}<div>`;
+    };
+
+    if (savePinnedMessage?.isPinnedContent) {
+      pinnedMessageContainer.classList.remove('vjs-chat__pinned-message_hidden');
+      pinnedMessageContainer.innerHTML = savePinnedMessage.isPinnedContent;
+    } else if (messageArrayFeed.length !== messageArrayFeedLength) {
+      pinnedMessageContainer.classList.add('vjs-chat__pinned-message_hidden');
+    };
+    adminEl.onchange = function() {
+      if (adminEl.checked) {
+        admin = true;
+      };
+    };
+
+    if (messageArrayFeed.length === messageArrayFeedLength) {
+      id = messageArrayFeed.length;
+    } else {
+      videoEl.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat__send-messages-container_hidden');
+      videoEl.querySelector('.vjs-chat__registr-container').classList.add('vjs-chat__registr-container_hidden');
+    };
+    if (saveAvatar !== null) {
+      btnLoad.style.backgroundImage = saveAvatar.avatar;
+    };
+
+    textareaMessage.onclick = function() {
+      this.textContent = '';
+      this.onclick = null;
+    };
+  };
 
   function fillingStorageAva() {
+    saveImg = ( {'avatar': btnLoad.style.backgroundImage} );
     inputDownload.onchange = function() { //загрузка и сохранение аватарки
       let file = videoEl.querySelector('input[type=file]').files[0];
       readerImg = new FileReader();
       readerImg.onloadend = function() {
         btnLoad.style.backgroundImage = "url('" + readerImg.result + "')";
         saveImg = ( {'avatar': btnLoad.style.backgroundImage} );
-        localStorage.setItem( 'messageAva', JSON.stringify(saveImg) );
       };
+      
       file ? readerImg.readAsDataURL(file) : btnLoad.style.backgroundImage = "url('img/default_ava.png')";
     };
-    saveAvatar = JSON.parse( localStorage.getItem('messageAva') );
-    return saveAvatar;
-  };
-  fillingStorageAva();
-
-  textareaMessage.onclick = function() {
-    this.textContent = '';
-    this.onclick = null;
+    for (let n = messageArrayFeedLength; n < messageArrayFeed.length; n++) {//аватарка в сообщениях
+      messagesAvatar[n].style.backgroundImage = saveImg.avatar || 'url(img/default_ava.png)';
+    };
+    return saveImg;
   };
 
-  btnLogin.onclick = function() {//сохранение имя пользователя, показ чата
-    user = ( {'userName': inputUsername.value, 'isAdmin': admin} );
-    localStorage.setItem( 'Username', JSON.stringify(user) );
-    videoEl.querySelector('.vjs-chat__registr-container').classList.add('vjs-chat__registr-container_hidden');
-    videoEl.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat__send-messages-container_hidden');
-  };
-
-  for (let n = messageArrayFeedLength; n < storageMessage.length; n++) {//аватарка в сообщениях
-    messagesAvatar[n].style.backgroundImage = saveAvatar.avatar || 'url(img/default_ava.png)';
-  };
-
-  let messageContent = '';
   function fillingMessageContent() {
-    saveUser = JSON.parse( localStorage.getItem('Username') );
-    themeMessage = (admin || saveUser.isAdmin) ? 'vjs-chat_theme_admin' : 'vjs-chat_theme';
-
-    let messageContentAnswer = (toAnswer !== '') ? `<div class="vjs-chat__message_answer">${toAnswer}</div>${saveUser.userName}</br>${textareaMessage.textContent}` :
-    `${saveUser.userName}</br>${textareaMessage.textContent}`;
+    themeMessage = (admin || state.isAdmin) ? 'vjs-chat_theme_admin' : 'vjs-chat_theme';
+    let messageContentAnswer = (toAnswer !== '') ? `<div class="vjs-chat__message_answer">${toAnswer}</div>${state.userName}</br>${textareaMessage.textContent}` :
+    `${state.userName}</br>${textareaMessage.textContent}`;
     messageContent = `
       <div class="vjs-chat__container-fullmessage">
-        <div class="vjs-chat__img-ava"></div>
+        <div class="vjs-chat__img-ava" style="background-image: ${saveImg.avatar} "></div>
         <div class="vjs-chat__message ${themeMessage} vjs-chat__message_${id}"> ${messageContentAnswer}
       </div>
       <img src="img/otvet2.png" class="vjs-chat__img-answer" id="${videoEl.querySelectorAll('.vjs-chat__message').length }" alt="answer" title="Ответить">`;
     return messageContent;
   };
 
-  textareaMessage.onkeyup = function(event) {//отправка по enter
-    if(event.keyCode === 13) {
+  function sendingMessage() {
+    textareaMessage.onkeyup = function(event) {//отправка по enter
+      if(event.keyCode === 13) {
+        let answerMessage = videoEl.querySelector('.vjs-chat__container-answer-message');
+        answerMessage.classList.add('vjs-chat__container-answer-message_hidden');
+
+        fillingStorageAva();
+        fillingMessageContent();
+
+        messageArrayFeed.push( {'id':id,
+          "message": textareaMessage.textContent, "avatar": saveImg.avatar, "userName": state.userName,
+          "isAdmin": state.isAdmin, "isPinned": false, "answerTo": answerIndex} );
+
+        chatContainer.innerHTML += messageContent;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        textareaMessage.textContent = '';
+        id += 1;
+      };
+      fillingStoragePinnedMessage();
+      fillingStorageAnswerMessage();
+
       let answerMessage = videoEl.querySelector('.vjs-chat__container-answer-message');
-      answerMessage.classList.add('vjs-chat__container-answer-message_hidden');
-
-      fillingStorageAva();
-      fillingMessageContent();
-
-      messageArrayFeed.push( {'id':id,
-        "message": textareaMessage.textContent, "avatar": saveAvatar.avatar, "userName": saveUser.userName,
-        "isAdmin": saveUser.isAdmin, "isPinned": false, "answerTo": answerIndex} );
-      localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
-
-      chatContainer.innerHTML += messageContent;
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-      textareaMessage.textContent = '';
-
-      id += 1;
-      storageMessage = JSON.parse( localStorage.getItem('messageList') );
-    };
-    fillingStoragePinnedMessage();
-    fillingStorageAnswerMessage();
-
-    let answerMessage = videoEl.querySelector('.vjs-chat__container-answer-message');
-    if ( answerMessage.classList.contains('vjs-chat__container-answer-message_hidden') ) {
-      toAnswer = '';
+      if ( answerMessage.classList.contains('vjs-chat__container-answer-message_hidden') ) {
+        toAnswer = '';
+      };
     };
   };
 
@@ -266,34 +256,25 @@ function ChatPlugin() {
       videoEl.querySelector('.vjs-chat__message_'+i).addEventListener('click', function() {
         pinnedMessageContainer.classList.remove('vjs-chat__pinned-message_hidden');
         pinnedMessageContainer.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="zakrep">
-          <div class="vjs-chat_pinned-line">${storageMessage[i].userName}<br>${storageMessage[i].message}`;
-
+          <div class="vjs-chat_pinned-line">${messageArrayFeed[i].userName}<br>${messageArrayFeed[i].message}`;
         messageArrayFeed[i].isPinned = true;
-        pinnedMessage = storageMessage[i];
-        localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":pinnedMessageContainer.innerHTML}) );
-        localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
+        pinnedMessage = messageArrayFeed[i];
       });
     };
     pinnedMessageContainer.onclick = function() {
       this.classList.add('vjs-chat__pinned-message_hidden');
       pinnedMessageContainer.innerHTML = '';
-      localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":pinnedMessageContainer.innerHTML}) );
       for (let i=0; i < divMessage.length; i++) {
-        if (storageMessage[i] === pinnedMessage) {
-          messageArrayFeed[i].isPinned = false;
-          localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":pinnedMessageContainer.innerHTML}) );
-          localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
-        };
+        if (messageArrayFeed[i] === pinnedMessage) continue;
+        messageArrayFeed[i].isPinned = false;
       };
     };
     return savePinnedMessage;
   };
-  fillingStoragePinnedMessage();
 
-  let toAnswer= '';
   function fillingStorageAnswerMessage() {
     let answerMessage = videoEl.querySelector('.vjs-chat__container-answer-message');
-    for (let i=0; i < storageMessage.length; i++) {
+    for (let i=0; i < messageArrayFeed.length; i++) {
       document.getElementById(i).addEventListener('click', function() {
         answerMessage.classList.remove('vjs-chat__container-answer-message_hidden');
         toAnswer = videoEl.querySelectorAll('.vjs-chat__message')[i].innerHTML;
@@ -304,11 +285,22 @@ function ChatPlugin() {
       toAnswer = '';
       answerMessage.classList.add('vjs-chat__container-answer-message_hidden');
       messageArrayFeed[answerIndex].toAnswer = null;
-      localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
     };
     return answerIndex;
   };
+
+  fillingStorageUser();
+  fillingChatContainer();
+  fillingStorageAva();
   fillingStorageAnswerMessage();
+  fillingStoragePinnedMessage();
+  sendingMessage();
+
+  window.onbeforeunload = function() {
+    localStorage.setItem( 'messageAva', JSON.stringify(saveImg) );
+    localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
+    localStorage.setItem( 'Pinned', JSON.stringify({"isPinnedContent":pinnedMessageContainer.innerHTML}) );
+  };
 };
 
 videojs.registerPlugin('ChatPlugin', ChatPlugin);
