@@ -100,8 +100,8 @@ function ChatPlugin() {
     toAnswer= '',
     answerIndex = null,
     state = saveUser;
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-  vjsChat.classList.add('vjs-chat_hidden');
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+  // vjsChat.classList.add('vjs-chat_hidden');
   if (storageMessage !== null) {
     messageArrayFeed = storageMessage;
   };
