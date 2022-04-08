@@ -34,42 +34,44 @@ let messageArrayFeed = [
     "answerTo": "2"
   }
 ];
-let messageArrayFeedLength = messageArrayFeed.length,
-  storageMessage = JSON.parse( localStorage.getItem('messageList') ),
-  admin = false,
-  answerIndex = null,
-  readerImg = '',
-  themeMessage = '',
-  messageContent = '',
-  toAnswer= '',
-  lastPinned = '',
-  state = {};
 
 const Component = videojs.getComponent('Component');
 class ChatComponent extends Component {
   constructor(player) {
     super(player);
-  };
-  createEl() {
-    const element = videojs.createEl('div', {
-      className: 'vjs-chat',
-    });
-    element.insertAdjacentHTML( 'afterbegin', this.getTemplate() );
+    let element = this.el();
+    this.messageArrayFeedLength = messageArrayFeed.length;
+    this.storageMessage = JSON.parse( localStorage.getItem('messageList') );
+    this.admin = false;
+    this.answerIndex = null;
+    this.readerImg = '';
+    this.themeMessage = '';
+    this.messageContent = '';
+    this.toAnswer= '';
+    this.lastPinned = '';
+    this.state = {};
+
     this.setFillingStorageUser(element);
-    this.fillingStorageAva(element);
+    this.fillingStorageAvatar(element);
     this.fillingChatContainer(element);
     this.fillingMessageContent(element);
     this.sendingMessage(element);
     this.fillingStoragePinnedMessage(element);
     this.fillingStorageAnswerMessage(element);
     this.fillingStorageBeforeunload();
+  };
+  createEl() {
+    const element = videojs.createEl('div', {
+      className: 'vjs-chat',
+    });
+    element.insertAdjacentHTML( 'afterbegin', this.getTemplate() );
     return element;
   };
 
   getStorageMessage() {
-    if (storageMessage !== null) {
-        messageArrayFeed = storageMessage;
-      };
+    if (this.storageMessage !== null) {
+      messageArrayFeed = this.storageMessage;
+    };
     return messageArrayFeed;
   };
 
@@ -78,46 +80,41 @@ class ChatComponent extends Component {
     let inputUsername = element.querySelector('.vjs-chat__input-username');
     let id = messageArrayFeed.length;
     let adminEl = element.querySelector('.vjs-chat__input-admin');
-    adminEl.onchange = function() {
-      adminEl.checked ? admin = true : admin = false;
+    adminEl.onchange = () => {
+      this.admin = adminEl.checked;
     };
-    btnLogin.onclick = function() {//сохранение имя пользователя, показ чата
-      state.userName = inputUsername.value;
-      state.isAdmin = admin;
+    btnLogin.onclick = () => {//сохранение имя пользователя, показ чата
+      this.state.userName = inputUsername.value;
+      this.state.isAdmin = this.admin;
       element.querySelector('.vjs-chat__registr-container').classList.add('vjs-chat__registr-container_hidden');
       element.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat__send-messages-container_hidden');
     };
-    if (messageArrayFeed.length !== messageArrayFeedLength) {
-      state.userName = messageArrayFeed[id-1].userName;
-      state.isAdmin = messageArrayFeed[id-1].isAdmin;
+    if (messageArrayFeed.length !== this.messageArrayFeedLength) {
+      this.state.userName = messageArrayFeed[id-1].userName;
+      this.state.isAdmin = messageArrayFeed[id-1].isAdmin;
     };
-    return state
+    return this.state;
   };
 
-  fillingStorageAva(element) {
-    let inputDownload = element.querySelector('.vjs-chat__input-download-ava');
+  fillingStorageAvatar(element) {
+    let inputDownload = element.querySelector('.vjs-chat__input-download-avatar');
     let btnLoad = element.querySelector('.vjs-chat__button-load');
-    let messagesAvatar = element.getElementsByClassName('vjs-chat__img-ava');
-    state.avatar = btnLoad.style.backgroundImage;
-    inputDownload.onchange = function() { //загрузка и сохранение аватарки
+    this.state.avatar = btnLoad.style.backgroundImage;
+    inputDownload.onchange = () => { //загрузка и сохранение аватарки
       let file = element.querySelector('input[type=file]').files[0];
-      readerImg = new FileReader();
-      readerImg.onloadend = function() {
-        btnLoad.style.backgroundImage = "url('" + readerImg.result + "')";
-        state.avatar = btnLoad.style.backgroundImage;
+      this.readerImg = new FileReader();
+      this.readerImg.onloadend = () => {
+        btnLoad.style.backgroundImage = "url('" + this.readerImg.result + "')";
+        this.state.avatar = btnLoad.style.backgroundImage;
       };
-      
-      file ? readerImg.readAsDataURL(file) : btnLoad.style.backgroundImage = "url('img/default_ava.png')";
+      file ? this.readerImg.readAsDataURL(file) : btnLoad.style.backgroundImage = "url('img/default_ava.png')";
     };
-    for (let n = messageArrayFeedLength; n < messageArrayFeed.length; n++) {//аватарка в сообщениях
-      messagesAvatar[n].style.backgroundImage = state.avatar || 'url(img/default_ava.png)';
-    };
-    return state;
+    return this.state;
   };
 
   fillingChatContainer(element) {
     this.getStorageMessage();
-    let messagesAvatar = element.getElementsByClassName('vjs-chat__img-ava');
+    let messagesAvatar = element.getElementsByClassName('vjs-chat__img-avatar');
     let chatContainer = element.querySelector('.vjs-chat__messages-container');
     let pinnedMessageContainer = element.querySelector('.vjs-chat__pinned-message');
     let btnLoad = element.querySelector('.vjs-chat__button-load');
@@ -129,34 +126,33 @@ class ChatComponent extends Component {
         </div>${messageArrayFeed[i].userName}</br>${messageArrayFeed[i].message}`;
       chatContainer.innerHTML += `
         <div class="vjs-chat__container-fullmessage">
-          <div class="vjs-chat__img-ava"></div>
-          <div class="vjs-chat__message vjs-chat__message_${ i }">${chatContainerContent}</div>
+          <div class="vjs-chat__img-avatar"></div>
+          <div class="vjs-chat__message vjs-chat__message_${ i } ${messageArrayFeed[i].isAdmin ? 'vjs-chat_theme_admin' : 'vjs-chat_theme'}">
+            ${chatContainerContent}</div>
         <img src="img/otvet2.png" class="vjs-chat__img-answer vjs-chat__img-answer_${ i }" alt="answer" title="Ответить">`;
 
       if (messageArrayFeed[i].avatar !== null) {
         messagesAvatar[i].style.backgroundImage = 'url(' + messageArrayFeed[i].avatar + ')';
       };
 
-      let chatMessage = element.querySelectorAll('.vjs-chat__message');
-      messageArrayFeed[i].isAdmin ? chatMessage[i].classList.add('vjs-chat_theme_admin') : chatMessage[i].classList.add('vjs-chat_theme');
-    };
-
-    for (let i = 0; i < messageArrayFeed.length; i++) {
-      if (messageArrayFeed[i].isPinned === true) {
+      if (messageArrayFeed[i].isPinned) {
         pinnedMessageContainer.classList.remove('vjs-chat__pinned-message_hidden');
         pinnedMessageContainer.innerHTML = `<img src="img/zakrep.png" class="vjs-chat__img-pinned" alt="pinned message">
-        <div class="vjs-chat_pinned-line">${messageArrayFeed[i].userName}<br>${messageArrayFeed[i].message}`;;
+        <div class="vjs-chat_pinned-line">${messageArrayFeed[i].userName}<br>${messageArrayFeed[i].message}`;
       };
     };
+    for (let i = this.messageArrayFeedLength; i < messageArrayFeed.length; i++) {
+      messagesAvatar[i].style.backgroundImage = (messageArrayFeed[messageArrayFeed.length-1].avatar !== '') ? messageArrayFeed[messageArrayFeed.length-1].avatar : 'url(img/default_ava.png)';
+    };
 
-    if (messageArrayFeed.length === messageArrayFeedLength) {
+    if (messageArrayFeed.length === this.messageArrayFeedLength) {
       id = messageArrayFeed.length;
     } else {
       element.querySelector('.vjs-chat__send-messages-container').classList.remove('vjs-chat__send-messages-container_hidden');
       element.querySelector('.vjs-chat__registr-container').classList.add('vjs-chat__registr-container_hidden');
     };
-    this.fillingStorageAva(element);
-    if (state.avatar === '') {
+    this.fillingStorageAvatar(element);
+    if (this.state.avatar === '') {
       btnLoad.style.backgroundImage = messageArrayFeed[id-1].avatar;
     };
   };
@@ -167,20 +163,19 @@ class ChatComponent extends Component {
     this.fillingStorageAnswerMessage(element);
     let id = messageArrayFeed.length;
     let textareaMessage = element.querySelector('.vjs-chat__textarea');
-    themeMessage = (admin || state.isAdmin) ? 'vjs-chat_theme_admin' : 'vjs-chat_theme';
-    let messageContentAnswer = (toAnswer !== '') ? `<div class="vjs-chat__message_answer">${toAnswer}</div>${state.userName}</br>${textareaMessage.textContent}` :
-    `${state.userName}</br>${textareaMessage.textContent}`;
-    messageContent = `
+    this.themeMessage = (this.admin || this.state.isAdmin) ? 'vjs-chat_theme_admin' : 'vjs-chat_theme';
+    let messageContentAnswer = (this.toAnswer !== '') ? `<div class="vjs-chat__message_answer">${this.toAnswer}</div>${this.state.userName}</br>${textareaMessage.textContent}` :
+    `${this.state.userName}</br>${textareaMessage.textContent}`;
+    this.messageContent = `
       <div class="vjs-chat__container-fullmessage">
-        <div class="vjs-chat__img-ava" style="background-image: ${state.avatar} "></div>
-        <div class="vjs-chat__message ${themeMessage} vjs-chat__message_${id}"> ${messageContentAnswer}
+        <div class="vjs-chat__img-avatar" style="background-image: ${this.state.avatar} "></div>
+        <div class="vjs-chat__message ${this.themeMessage} vjs-chat__message_${id}"> ${messageContentAnswer}
       </div>
       <img src="img/otvet2.png" class="vjs-chat__img-answer vjs-chat__img-answer_${element.querySelectorAll('.vjs-chat__message').length }" alt="answer" title="Ответить">`;
-    return messageContent;
+    return this.messageContent;
   };
 
   sendingMessage(element) {
-    let Chat = this;
     let id = messageArrayFeed.length;
     let chatContainer = element.querySelector('.vjs-chat__messages-container');
     let textareaMessage = element.querySelector('.vjs-chat__textarea');
@@ -188,29 +183,33 @@ class ChatComponent extends Component {
       this.textContent = '';
       this.onclick = null;
     };
-    textareaMessage.onkeyup = function(event) {//отправка по enter
+    textareaMessage.onkeyup = (event) => {//отправка по enter
       if(event.keyCode === 13) {
         let answerMessage = element.querySelector('.vjs-chat__container-answer-message');
         answerMessage.classList.add('vjs-chat__container-answer-message_hidden');
 
-        Chat.fillingStorageAva(element);
-        Chat.fillingMessageContent(element);
+        this.fillingStorageAvatar(element);
+        this.fillingMessageContent(element);
 
         messageArrayFeed.push( {'id':id,
-          "message": textareaMessage.textContent, "avatar": state.avatar, "userName": state.userName,
-          "isAdmin": state.isAdmin, "isPinned": false, "answerTo": answerIndex} );
+          "message": textareaMessage.textContent, "avatar": this.state.avatar, "userName": this.state.userName,
+          "isAdmin": this.state.isAdmin, "isPinned": false, "answerTo": this.answerIndex} );
 
-        chatContainer.innerHTML += messageContent;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        chatContainer.innerHTML += this.messageContent;
         textareaMessage.textContent = '';
         id += 1;
+        let messagesAvatar = element.getElementsByClassName('vjs-chat__img-avatar');
+        for (let i = this.messageArrayFeedLength; i < id; i++) {
+          messagesAvatar[i].style.backgroundImage = (messageArrayFeed[id-1].avatar !== '') ? messageArrayFeed[id-1].avatar : 'url(img/default_ava.png)';
+        };
       };
-      Chat.fillingStoragePinnedMessage(element);
-      Chat.fillingStorageAnswerMessage(element);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      this.fillingStoragePinnedMessage(element);
+      this.fillingStorageAnswerMessage(element);
 
       let answerMessage = element.querySelector('.vjs-chat__container-answer-message');
       if ( answerMessage.classList.contains('vjs-chat__container-answer-message_hidden') ) {
-        toAnswer = '';
+        this.toAnswer = '';
       };
     };
   };
@@ -220,11 +219,11 @@ class ChatComponent extends Component {
     let divMessage = element.getElementsByClassName('vjs-chat__message');
     for (let i=0; i < divMessage.length; i++) {
       if (messageArrayFeed[i].isPinned) {
-        lastPinned = messageArrayFeed[i];
+        this.lastPinned = messageArrayFeed[i];
       };
-      element.querySelector('.vjs-chat__message_'+i).addEventListener('click', function() {
+      element.querySelector('.vjs-chat__message_'+i).addEventListener('click', () => {
         for (let i = 0; i < divMessage.length; i++) {
-          if (messageArrayFeed[i] === lastPinned) {
+          if (messageArrayFeed[i] === this.lastPinned) {
             messageArrayFeed[i].isPinned = false;
           };
         };
@@ -247,21 +246,21 @@ class ChatComponent extends Component {
   fillingStorageAnswerMessage(element) {
     let answerMessage = element.querySelector('.vjs-chat__container-answer-message');
     for (let i=0; i < messageArrayFeed.length; i++) {
-      element.querySelector('.vjs-chat__img-answer_'+i).addEventListener('click', function() {
+      element.querySelector('.vjs-chat__img-answer_'+i).addEventListener('click', () => {
         answerMessage.classList.remove('vjs-chat__container-answer-message_hidden');
-        toAnswer = element.querySelectorAll('.vjs-chat__message')[i].innerHTML;
-        answerIndex = i;
+        this.toAnswer = element.querySelectorAll('.vjs-chat__message')[i].innerHTML;
+        this.answerIndex = i;
       });
     };
-    answerMessage.onclick = function() {
-      toAnswer = '';
+    answerMessage.onclick = () => {
+      this.toAnswer = '';
       answerMessage.classList.add('vjs-chat__container-answer-message_hidden');
-      messageArrayFeed[answerIndex].toAnswer = null;
+      messageArrayFeed[this.answerIndex].toAnswer = null;
     };
-    return answerIndex, toAnswer;
   };
+
   fillingStorageBeforeunload() {
-    this.getStorageMessage()
+    this.getStorageMessage();
     window.addEventListener('beforeunload', function() {
       localStorage.setItem( 'messageList', JSON.stringify(messageArrayFeed) );
     });
@@ -281,7 +280,7 @@ class ChatComponent extends Component {
       <div class="vjs-chat__send-messages-container vjs-chat__send-messages-container_hidden">
         <div class="vjs-chat__contaiher-textarea">
           <div class="vjs-chat__button-load">
-            <input class="vjs-chat__input-download-ava" type="file" accept="image/*">
+            <input class="vjs-chat__input-download-avatar" type="file" accept="image/*">
           </div>
           <div class="vjs-chat__textarea" contenteditable>Добавить комментарий</div>
         </div>
@@ -300,6 +299,9 @@ class ButtonToggle extends videojs.getComponent('Button') {
       innerHTML: '<svg class="vjs-svg-use-button" width="70%" height="70%" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><use class="vjs-chat__svg-use-button" xlink:href="icon.svg#icon_1"/></svg>',
       className: 'vjs-chat__button-toggle',
     });
+    return element;
+  };
+  handleClick() {
     let videoEl =  this.player().el();
     let vjsChat = videoEl.querySelector('.vjs-chat');
     let svgBttn = element.querySelector('svg');
@@ -313,7 +315,6 @@ class ButtonToggle extends videojs.getComponent('Button') {
         svgBttn.classList.add("vjs-svg-use-button_color");
       };
     };
-    return element;
   };
 };
 
