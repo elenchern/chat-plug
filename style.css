@@ -155,7 +155,7 @@ html, body {
     cursor: pointer;
 }
 
-.vjs-chat__button-choose-ava {
+.vjs-chat__button-choose-avatar {
     position: absolute;
     top: 20px;
     left: 5%;
@@ -164,14 +164,14 @@ html, body {
     color: black;
 }
 
-.vjs-chat__input-download-ava {
+.vjs-chat__input-download-avatar {
     max-height: 30px;
     width: 30px;
     opacity: 0;
     cursor: pointer;
 }
 
-.vjs-chat__button-load:hover .vjs-chat__button-choose-ava {
+.vjs-chat__button-load:hover .vjs-chat__button-choose-avatar {
     visibility:visible
 }
 
@@ -249,7 +249,7 @@ html, body {
     padding: 10px;
 }
 
-.vjs-chat__img-ava {
+.vjs-chat__img-avatar {
     background-image: url('img/default_ava.png');
     background-size: 30px;
     position: absolute;
